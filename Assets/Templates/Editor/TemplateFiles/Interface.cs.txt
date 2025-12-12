@@ -1,0 +1,15 @@
+/*****************************************************************************
+// File Name : #SCRIPTNAME#.cs
+// Author : 
+// Creation Date : 
+// Last Modified : 
+//
+// Brief Description : 
+*****************************************************************************/
+
+    #ROOTNAMESPACEBEGIN#
+public interface #SCRIPTNAME#
+{
+    #NOTRIM#
+}
+#ROOTNAMESPACEEND#

@@ -1,0 +1,17 @@
+/*****************************************************************************
+// File Name : #SCRIPTNAME#.cs
+// Author : 
+// Creation Date : 
+// Last Modified : 
+//
+// Brief Description : 
+*****************************************************************************/
+using UnityEngine;
+
+    #ROOTNAMESPACEBEGIN#
+[CreateAssetMenu(fileName = "#SCRIPTNAME#", menuName = "ScriptableObjects/#NAME#")]
+public class #SCRIPTNAME# : ScriptableObject
+{
+    #NOTRIM#
+}
+#ROOTNAMESPACEEND#

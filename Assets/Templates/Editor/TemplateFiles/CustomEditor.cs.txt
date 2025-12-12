@@ -1,0 +1,34 @@
+/*****************************************************************************
+// File Name : #SCRIPTNAME#.cs
+// Author : 
+// Creation Date : 
+// Last Modified : 
+//
+// Brief Description : 
+*****************************************************************************/
+using UnityEditor;
+
+    #ROOTNAMESPACEBEGIN#
+[CustomEditor(typeof(YourComponentType))]
+public class #SCRIPTNAME# : Editor
+{
+    
+    // SerializedProperty variables.
+
+    /// <summary>
+    /// Initialize SerializedProperties here.
+    /// </summary>
+    protected virtual void OnEnable()
+    {
+
+    }
+
+    /// <summary>
+    /// Draw the editor.
+    /// </summary>
+    public override void OnInspectorGUI()
+    {
+        base.OnInspectorGUI();
+    }
+}
+#ROOTNAMESPACEEND#
