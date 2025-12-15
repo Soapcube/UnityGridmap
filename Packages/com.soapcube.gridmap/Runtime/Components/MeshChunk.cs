@@ -56,5 +56,23 @@ namespace Gridmap
 
             return TilesInChunk[index];
         }
+
+        /// <summary>
+        /// Adds a tile to the chunk
+        /// </summary>
+        /// <param name="tile">The tile to be set</param>
+        /// <param name="pos">The position of the tile in the chunk</param>
+        public void SetTileInChunk(MeshTileBase tile, Vector3Int pos)
+        {
+            //Wrap around to our tilemap, so we don't get out of range exceptions
+            //This might be a bad idea but we'll see
+            pos.x %= chunkSize.x;
+            pos.y %= chunkSize.y;
+            pos.z %= chunkSize.z;
+
+            int index = pos.x + (pos.y * chunkSize.x) + (pos.z * chunkSize.x * chunkSize.y);
+
+            TilesInChunk[index] = tile;
+        }
     }
 }
