@@ -2,7 +2,9 @@
     "name": "soapcube.gridmap.Editor",
     "rootNamespace": "Gridmap.Editor",
     "references": [
-        "soapcube.gridmap"
+        "soapcube.gridmap",
+        "Unity.2D.Tilemap.Editor",
+        "Unity.2D.Tilemap.Extras.Editor"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
