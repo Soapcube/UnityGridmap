@@ -21,7 +21,17 @@ namespace Gridmap.Brushes
         // These are parameters for a size and pivot point int the default tilemap GridBrush.
         // Unsure what they do, but will reference later if necessary.
 
-        //[Header("Gridmap Brush Settings")]
+        [Header("Gridmap Brush Settings")]
+        [SerializeField, Tooltip("Whether this brush should automatically update the position of the tilemap to " +
+            "paint on different elevation layers.")] 
+        private bool autoUpdateElevation;
+        [SerializeField, Tooltip("The elevation of the brush relative to (0, 0, 0).")] 
+        private int brushElevation;
+
+        #region Properties
+        public bool AutoUpdateElevation => autoUpdateElevation;
+        public int BrushElevation => brushElevation;
+        #endregion
 
         #region Tools
         /// <summary>
@@ -33,6 +43,8 @@ namespace Gridmap.Brushes
         /// <param name="position">The position that was painted on in XYZ notation regardless of grid orientation. </param>
         public override void Paint(GridLayout gridLayout, GameObject brushTarget, Vector3Int position)
         {
+            // Offset position based on the brushElevation since it isn't applied automatically.
+            position.z += brushElevation;
             // Reuse the BoxFill function to paint a singular tile.
             BoundsInt bounds = new BoundsInt(position, DEFAULT_CELL_SIZE);
             BoxFill(gridLayout, brushTarget, bounds);

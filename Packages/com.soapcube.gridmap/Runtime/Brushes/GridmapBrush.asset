@@ -12,3 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b96a2bfc68fd16943a14c912b9e5cbd0, type: 3}
   m_Name: GridmapBrush
   m_EditorClassIdentifier: soapcube.gridmap::Gridmap.Brushes.GridmapBrush
+  autoUpdateElevation: 0
+  brushElevation: 0
