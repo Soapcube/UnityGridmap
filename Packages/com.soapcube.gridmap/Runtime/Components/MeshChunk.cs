@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Gridmap
@@ -14,6 +15,7 @@ namespace Gridmap
         /// Size of the chunk
         /// </summary>
         private Vector3Int chunkSize;
+        private Mesh mesh;
 
         /// <summary>
         /// Position of the Mesh Chunk
@@ -24,6 +26,7 @@ namespace Gridmap
         /// All the tiles within the chunk
         /// </summary>
         public MeshTileBase[] TilesInChunk { get => tilesInChunk; set => tilesInChunk = value; }
+        public Mesh Mesh { get => mesh; }
 
         /// <summary>
         /// Create a new MeshChunk
@@ -37,6 +40,7 @@ namespace Gridmap
             tilesInChunk = new MeshTileBase[chunkSize.x * chunkSize.y * chunkSize.z];
 
             this.chunkSize = chunkSize;
+            mesh = new Mesh();
         }
 
         /// <summary>
@@ -73,6 +77,20 @@ namespace Gridmap
             int index = pos.x + (pos.y * chunkSize.x) + (pos.z * chunkSize.x * chunkSize.y);
 
             TilesInChunk[index] = tile;
+
+            //If we have no loop connections, set some up
+            if (TilesInChunk[index].LoopConnections.Count == 0)
+            {
+                TilesInChunk[index].SetupLoopConnections();
+            }
+        }
+
+        /// <summary>
+        /// This is a simple bake for now, we'll get more complex at some point so we don't take up as much space
+        /// </summary>
+        public void BakeMesh()
+        {
+
         }
     }
 }

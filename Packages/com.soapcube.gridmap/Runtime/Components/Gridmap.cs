@@ -5,6 +5,7 @@ namespace Gridmap
 {
     public class Gridmap : MonoBehaviour
     {
+        [SerializeField] private MeshTileBase tile;
         /// <summary>
         /// Size of the chunks
         /// </summary>
@@ -14,6 +15,16 @@ namespace Gridmap
         /// The chunks in this map
         /// </summary>
         private List<MeshChunk> chunks = new();
+
+        private void Start()
+        {
+            PlaceTileAtPoint(tile, Vector3Int.zero);
+            foreach (var chunk in chunks)
+            {
+                chunk.BakeMesh();
+                GetComponent<MeshFilter>().mesh = chunk.Mesh;
+            }
+        }
 
         /// <summary>
         /// Places a tile at this point, generating a new chunk if there isn't one already
