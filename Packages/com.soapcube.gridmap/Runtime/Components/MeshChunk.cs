@@ -1,3 +1,11 @@
+/*****************************************************************************
+// File Name : MeshChunk.cs
+// Author : Lucas Fehlberg
+// Creation Date : 12/22/2025
+// Last Modified : 12/23/2025
+//
+// Brief Description : Stores data about the tiles in a certain chunk in the gridmap.
+*****************************************************************************/
 using UnityEngine;
 
 namespace Gridmap
@@ -46,13 +54,7 @@ namespace Gridmap
         /// <returns></returns>
         public MeshTileBase GetTileAtPosition(Vector3Int pos)
         {
-            //Wrap around to our tilemap, so we don't get out of range exceptions
-            //This might be a bad idea but we'll see
-            pos.x %= chunkSize.x;
-            pos.y %= chunkSize.y;
-            pos.z %= chunkSize.z;
-
-            int index = pos.x + (pos.y * chunkSize.x) + (pos.z * chunkSize.x * chunkSize.y);
+            int index = GetTileIndex(pos, chunkSize);
 
             return TilesInChunk[index];
         }
@@ -64,15 +66,28 @@ namespace Gridmap
         /// <param name="pos">The position of the tile in the chunk</param>
         public void SetTileInChunk(MeshTileBase tile, Vector3Int pos)
         {
+            int index = GetTileIndex(pos, chunkSize);
+
+            // Debug to prove that adding tiles works.
+            Debug.Log("Set the tile at position " + pos + " in chunk position " + position + " to the tile  " + tile);
+            TilesInChunk[index] = tile;
+        }
+
+        /// <summary>
+        /// Gets the index of a certain position in a chunk given the chunk's size.
+        /// </summary>
+        /// <param name="pos">The position within the chunk.</param>
+        /// <param name="chunkSize">The size of teh chunk.</param>
+        /// <returns>The index of that cell in the chunk.</returns>
+        private static int GetTileIndex(Vector3Int pos, Vector3Int chunkSize)
+        {
             //Wrap around to our tilemap, so we don't get out of range exceptions
             //This might be a bad idea but we'll see
             pos.x %= chunkSize.x;
             pos.y %= chunkSize.y;
             pos.z %= chunkSize.z;
 
-            int index = pos.x + (pos.y * chunkSize.x) + (pos.z * chunkSize.x * chunkSize.y);
-
-            TilesInChunk[index] = tile;
+            return pos.x + (pos.y * chunkSize.x) + (pos.z * chunkSize.x * chunkSize.y);
         }
     }
 }

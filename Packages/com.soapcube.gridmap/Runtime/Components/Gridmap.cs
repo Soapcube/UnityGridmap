@@ -41,7 +41,7 @@ namespace Gridmap
             }
 
             //Add the tile to the chunk
-            chunk.SetTileInChunk(tile, point);
+            chunk.SetTileInChunk(tile, point - chunkPosition);
         }
 
         /// <summary>
@@ -52,6 +52,16 @@ namespace Gridmap
         private MeshChunk GetChunkByPosition(Vector3Int position)
         {
             return chunks.Find(c => c.Position == position);
+        }
+
+        /// <summary>
+        /// Bakes the tile mesh information 
+        /// </summary>
+        /// <param name="editedBounds">Not sure if this is necessary, but this will have info on the edited tiles so 
+        /// it could be used to know what chunks to bake.</param>
+        public void BakeMesh(BoundsInt editedBounds)
+        {
+
         }
     }
 }
