@@ -68,6 +68,8 @@ namespace Gridmap
         {
             int index = GetTileIndex(pos, chunkSize);
 
+            // Debug to prove that adding tiles works.
+            Debug.Log("Set the tile at position " + pos + " in chunk position " + position + " to the tile  " + tile);
             TilesInChunk[index] = tile;
         }
 

@@ -41,7 +41,7 @@ namespace Gridmap
             }
 
             //Add the tile to the chunk
-            chunk.SetTileInChunk(tile, point);
+            chunk.SetTileInChunk(tile, point - chunkPosition);
         }
 
         /// <summary>
