@@ -4,7 +4,7 @@
 // Creation Date : 12/15/2025
 // Last Modified : 12/15/2025
 //
-// Brief Description : Base editor for the Gridmap brush.
+// Brief Description : Base editor for brushes that paint on the gridmap.
 *****************************************************************************/
 using System.Linq;
 using UnityEditor;
@@ -15,10 +15,10 @@ using UnityEngine.Tilemaps;
 
 namespace Gridmap.Brushes.Editor
 {
-    [CustomEditor(typeof(GridmapBrush), true)]
+    [CustomEditor(typeof(GridmapBrushBase), true)]
     public class GridmapBrushBaseEditor : GridBrushEditorBase
     {
-        public GridmapBrush targetBrush { get { return target as GridmapBrush; } }
+        public GridmapBrushBase targetBrush { get { return target as GridmapBrushBase; } }
 
         /// <summary>
         /// The collection of GameObjects that hold tilemaps that this brush can paint on.  
