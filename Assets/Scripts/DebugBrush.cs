@@ -24,7 +24,8 @@ namespace Gridmap.Brushes
 
             Vector3Int swizzPos = ConvertSwizzleSpace(position, gridLayout.cellSwizzle);
 
-            Debug.Log($"Grid Position: {swizzPos}.  World Space Position: {gridmap.GridToWorldPosition(swizzPos)}.");
+            Debug.Log($"Grid Position: {swizzPos}.  World Space Position: {gridmap.GridToWorldPosition(swizzPos)}.  " +
+                $"Center Position: {gridmap.GridToCenteredPosition(swizzPos)}");
         }
 
         /// <summary>

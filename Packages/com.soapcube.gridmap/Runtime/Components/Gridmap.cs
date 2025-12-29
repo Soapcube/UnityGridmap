@@ -84,8 +84,6 @@ namespace Gridmap
         /// <summary>
         /// Gets the position of the chunk that contains a given grid position.
         /// </summary>
-        /// <param name="gridPos">The grid position to get the chunk position of.</param>
-        /// <returns>The position of the chunk that contains the given grid position.</returns>
         private Vector3Int GetChunkPos(Vector3Int gridPos)
         {
             Vector3Int chunkPosition = gridPos;
@@ -100,22 +98,54 @@ namespace Gridmap
         }
         #endregion
 
+        #region Position Conversions
+        // All of these take the settings of the gridLayout into account so that if the grid gets modified they'll
+        // return accurate values.  I can simplify this down if needed. -Brandon
+
         /// <summary>
         /// Gets the world position of a given cell in the grid.
         /// </summary>
-        /// <param name="gridPos">The grid position to get the world position of. </param>
-        /// <returns>The center of the grid cell at gridPos in world space.</returns>
-        public Vector3 GridToWorldPosition(Vector3Int gridPos)
+        public Vector3 GridToWorldPosition(Vector3 gridPos)
         {
             //Vector3 worldPos = tilemap.CellToWorld(gridPos);
             Vector3 worldPos = tilemap.LocalToWorld(gridPos);
             // Scale the world position based on cell size and gap.
             for (int i = 0; i < 3; i++)
             {
-                worldPos[i] = (worldPos[i] * tilemap.layoutGrid.cellSize[i] * (1 + tilemap.layoutGrid.cellGap[i]));
+                worldPos[i] = (worldPos[i] * tilemap.layoutGrid.cellSize[i]) + (worldPos[i] * tilemap.layoutGrid.cellGap[i]);
             }
             return worldPos;
         }
+
+        /// <summary>
+        /// Gets the position at the center of the grid cell in grid space.
+        /// </summary>
+        /// <remarks>
+        /// Used for finding the position to center a certain tile's mesh at.
+        /// </remarks>
+        public Vector3 GridToCenteredPosition(Vector3Int gridPos)
+        {
+            // gridPos is always the bottom-left-back corner of the cell.
+            // Uses the tileAnchor parameter of the tilemap, but we can make a custom parameter if needed.
+            Vector3 centeredPosition = gridPos;
+            for (int i = 0; i < 3; i++)
+            {
+                float cellSize = tilemap.layoutGrid.cellSize[i];
+                float startPos = gridPos[i] * cellSize;
+                centeredPosition[i] = Mathf.LerpUnclamped(startPos, startPos + cellSize, 
+                    tilemap.tileAnchor[i]) + (gridPos[i] * tilemap.layoutGrid.cellGap[i]);
+            }
+            return centeredPosition;
+        }
+
+        /// <summary>
+        /// Gets the world position of the center of a given cell in the grid.
+        /// </summary>
+        public Vector3 GridToCenteredWorldPosition(Vector3Int gridPos)
+        {
+            return GridToWorldPosition(GridToCenteredPosition(gridPos));
+        }
+        #endregion
 
         /// <summary>
         /// Bakes the tile mesh information 
