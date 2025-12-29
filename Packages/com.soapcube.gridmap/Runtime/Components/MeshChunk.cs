@@ -73,6 +73,21 @@ namespace Gridmap
         }
 
         /// <summary>
+        /// Gets the relative position of a certain grid position witin a given chunk.
+        /// </summary>
+        /// <param name="gridPos"></param>
+        /// <returns></returns>
+        internal static Vector3Int GetChunkRelativePos(Vector3Int pos, Vector3Int chunkSize)
+        {
+            //Wrap around to our tilemap, so we don't get out of range exceptions
+            //This might be a bad idea but we'll see
+            pos.x = GridmapHelpers.Mod(pos.x, chunkSize.x);
+            pos.y = GridmapHelpers.Mod(pos.y, chunkSize.y);
+            pos.z = GridmapHelpers.Mod(pos.z, chunkSize.z);
+            return pos;
+        }
+
+        /// <summary>
         /// Gets the index of a certain position in a chunk given the chunk's size.
         /// </summary>
         /// <param name="pos">The position within the chunk.</param>
@@ -80,12 +95,7 @@ namespace Gridmap
         /// <returns>The index of that cell in the chunk.</returns>
         private static int GetTileIndex(Vector3Int pos, Vector3Int chunkSize)
         {
-            //Wrap around to our tilemap, so we don't get out of range exceptions
-            //This might be a bad idea but we'll see
-            pos.x = GridmapHelpers.Mod(pos.x, chunkSize.x);
-            pos.y = GridmapHelpers.Mod(pos.y, chunkSize.y);
-            pos.z = GridmapHelpers.Mod(pos.z, chunkSize.z);
-
+            pos = GetChunkRelativePos(pos, chunkSize);
             return pos.x + (pos.y * chunkSize.x) + (pos.z * chunkSize.x * chunkSize.y);
         }
     }

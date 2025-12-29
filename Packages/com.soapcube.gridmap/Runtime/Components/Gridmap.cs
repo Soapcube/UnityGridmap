@@ -100,7 +100,6 @@ namespace Gridmap
         }
         #endregion
 
-        #region Conversions
         /// <summary>
         /// Gets the world position of a given cell in the grid.
         /// </summary>
@@ -110,9 +109,13 @@ namespace Gridmap
         {
             //Vector3 worldPos = tilemap.CellToWorld(gridPos);
             Vector3 worldPos = tilemap.LocalToWorld(gridPos);
+            // Scale the world position based on cell size and gap.
+            for (int i = 0; i < 3; i++)
+            {
+                worldPos[i] = (worldPos[i] * tilemap.layoutGrid.cellSize[i] * (1 + tilemap.layoutGrid.cellGap[i]));
+            }
             return worldPos;
         }
-        #endregion
 
         /// <summary>
         /// Bakes the tile mesh information 
@@ -121,7 +124,7 @@ namespace Gridmap
         /// it could be used to know what chunks to bake.</param>
         public void BakeMesh(BoundsInt editedBounds)
         {
-
+           
         }
     }
 }
