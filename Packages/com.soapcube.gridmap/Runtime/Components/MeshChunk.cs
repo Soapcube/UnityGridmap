@@ -2,11 +2,11 @@
 // File Name : MeshChunk.cs
 // Author : Lucas Fehlberg
 // Creation Date : 12/22/2025
-// Last Modified : 12/23/2025
+// Last Modified : 3/25/2026
 //
 // Brief Description : Stores data about the tiles in a certain chunk in the gridmap.
 *****************************************************************************/
-using System.Collections.Generic;
+using NUnit.Framework;
 using UnityEngine;
 
 namespace Gridmap
@@ -74,7 +74,14 @@ namespace Gridmap
 
             // Debug to prove that adding tiles works.
             Debug.Log("Set the tile at position " + pos + " in chunk position " + position + " to the tile  " + tile);
+
             TilesInChunk[index] = tile;
+
+            ////If we have no loop connections, set some up
+            //if (TilesInChunk[index].LoopConnections.Count == 0)
+            //{
+            //    TilesInChunk[index].SetupLoopConnections();
+            //}
         }
 
         /// <summary>
@@ -93,23 +100,50 @@ namespace Gridmap
 
             int index = pos.x + (pos.y * chunkSize.x) + (pos.z * chunkSize.x * chunkSize.y);
 
-            TilesInChunk[index] = tile;
+            return index;
+        }
 
-            //If we have no loop connections, set some up
-            if (TilesInChunk[index].LoopConnections.Count == 0)
-            {
-                TilesInChunk[index].SetupLoopConnections();
-            }
+        private Vector3 GetPositionFromIndex(int index)
+        {
+            Vector3 offset = Vector3.zero;
+            
 
-            return pos.x + (pos.y * chunkSize.x) + (pos.z * chunkSize.x * chunkSize.y);
+            return offset;
         }
 
         /// <summary>
-        /// This is a simple bake for now, we'll get more complex at some point so we don't take up as much space
+        /// Bakes the mesh in a simple way
         /// </summary>
-        public void BakeMesh()
+        /// <returns>The baked mesh also saves the baked mesh to the MeshChunk's Mesh property</returns>
+        public Mesh BakeMesh()
         {
+            Mesh masterMesh = new();
+            CombineInstance[] instances = new CombineInstance[TilesInChunk.Length];
+            for (int i = 0; i < tilesInChunk.Length; i++)
+            {
+                //Get the mesh and add it to our mesh
+                Mesh tileMesh = tilesInChunk[i].GetMesh();
+                Vector3 offset = GetPositionFromIndex(i);
 
+                //So much math...This feels inefficient. I'll have to find a better way
+                //I found a better way
+                //Vector3[] offsetVertices = new Vector3[tileMesh.vertexCount];
+                //for(int j = 0; j < tileMesh.vertexCount; j++)
+                //{
+                //    offsetVertices[j] = tileMesh.vertices[j] + offset;
+                //}
+                //tileMesh.vertices = offsetVertices;
+                instances[i] = new CombineInstance
+                {
+                    mesh = tileMesh,
+                    transform = Matrix4x4.Translate(offset),
+                };
+            }
+
+            masterMesh.CombineMeshes(instances);
+            mesh = masterMesh;
+
+            return masterMesh;
         }
     }
 }

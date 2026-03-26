@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 85fcea25540d57d49b9b23344ff7a55f, type: 3}
   m_Name: Cube
   m_EditorClassIdentifier: soapcube.gridmap::Gridmap.MeshTile
-  mesh: {fileID: -2222346464153789849, guid: 031721fbe00a0eb46bc7352a1f30a685, type: 3}
+  mesh: {fileID: -5495902117074765545, guid: af7a7c48e22ec8845b18980fc0790e68, type: 3}
