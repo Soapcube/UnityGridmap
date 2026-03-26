@@ -56,10 +56,9 @@ namespace Gridmap
         /// </summary>
         /// <param name="pos">The position of the mesh inside the chunk</param>
         /// <returns></returns>
-        public MeshTileBase GetTileAtPosition(Vector3Int pos)
+        public MeshTileBase GetTile(Vector3Int pos)
         {
             int index = GetTileIndex(pos, chunkSize);
-
             return TilesInChunk[index];
         }
 
@@ -67,8 +66,8 @@ namespace Gridmap
         /// Adds a tile to the chunk
         /// </summary>
         /// <param name="tile">The tile to be set</param>
-        /// <param name="pos">The position of the tile in the chunk</param>
-        public void SetTileInChunk(MeshTileBase tile, Vector3Int pos)
+        /// <param name="pos">The position of the tile in gridmap space. (Not relative to the chunk)</param>
+        public void SetTile(MeshTileBase tile, Vector3Int pos)
         {
             int index = GetTileIndex(pos, chunkSize);
 
@@ -82,6 +81,21 @@ namespace Gridmap
             //{
             //    TilesInChunk[index].SetupLoopConnections();
             //}
+        }
+
+        /// <summary>
+        /// Gets the relative position of a certain grid position witin a given chunk.
+        /// </summary>
+        /// <param name="gridPos"></param>
+        /// <returns></returns>
+        internal static Vector3Int GetChunkRelativePos(Vector3Int pos, Vector3Int chunkSize)
+        {
+            //Wrap around to our tilemap, so we don't get out of range exceptions
+            //This might be a bad idea but we'll see
+            pos.x = GridmapHelpers.Mod(pos.x, chunkSize.x);
+            pos.y = GridmapHelpers.Mod(pos.y, chunkSize.y);
+            pos.z = GridmapHelpers.Mod(pos.z, chunkSize.z);
+            return pos;
         }
 
         /// <summary>

@@ -87,7 +87,7 @@ namespace Gridmap.Brushes
                 Vector3Int swizzPos = GridmapHelpers.ConvertSwizzleSpace(pos, gridLayout.cellSwizzle);
 
                 // Actual painting implementation goes here.
-                Debug.Log("Painted the tile " + GetMeshTile() + " at position " + swizzPos);
+                //Debug.Log("Painted the tile " + GetMeshTile() + " at position " + swizzPos);
                 gridmap.PlaceTileAtPoint(GetMeshTile(), swizzPos);
             }
 
