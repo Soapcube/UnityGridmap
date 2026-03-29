@@ -10,10 +10,11 @@ using UnityEngine;
 
 namespace Gridmap
 {
-    public static class GridmapHelpers
+    internal static class GridmapHelpers
     {
         #region CONSTS
-        public const Grid.CellSwizzle DEFAULT_GRID_NOTATION = GridLayout.CellSwizzle.XZY;
+        private const string ASSET_FOLDER = "Assets";
+        private const string MESH_FILE_EXTENSION = ".mesh";
         #endregion
 
         /// <summary>
@@ -23,8 +24,8 @@ namespace Gridmap
         /// <param name="targetSwizzleMode">The swizzle mode to convert the position into.</param>
         /// <param name="baseSwizzleMode">The current swizzle mode of the position.</param>
         /// <returns>The position in the specified swizzle mode.</returns>
-        public static Vector3Int ConvertSwizzleSpace(Vector3Int position, 
-            Grid.CellSwizzle targetSwizzleMode = DEFAULT_GRID_NOTATION, 
+        internal static Vector3Int ConvertSwizzleSpace(Vector3Int position, 
+            Grid.CellSwizzle targetSwizzleMode, 
             Grid.CellSwizzle baseSwizzleMode = Grid.CellSwizzle.XYZ)
         {
             /// Gets the tuple that converts the position from base swizzle spacea into XYZ swizzle space.
@@ -76,5 +77,73 @@ namespace Gridmap
 
             return position;
         }
+
+        /// <summary>
+        /// Returns the canonical modulus of a number to the mod of another number
+        /// </summary>
+        /// <remarks>
+        /// Differs from % in that % gives the remainder, which can be negative.  In this case, negative number loop 
+        /// around.
+        /// </remarks>
+        /// <param name="x">The first neumber</param>
+        /// <param name="m">The number to take the mod of.</param>
+        /// <returns>The canonical modulus number of X mod M.</returns>
+        internal static int Mod(int x, int m)
+        {
+            return ((x % m) + m) % m;
+        }
+
+        /// <summary>
+        /// Gets the sign of a given number
+        /// </summary>
+        /// <param name="x">The number to get the sign of.</param>
+        /// <returns>-1, 0, or 1, depending ont the sign of the number.</returns>
+        internal static int GetSign(int x)
+        {
+            if (x == 0) { return 0; }
+            return Mathf.Abs(x) / x;
+        }
+
+        /// <summary>
+        /// Gets the sign of a given number
+        /// </summary>
+        /// <param name="x">The number to get the sign of.</param>
+        /// <returns>-1, 0, or 1, depending ont the sign of the number.</returns>
+        internal static int GetSign(float x)
+        {
+            if (x == 0) { return 0; }
+            return (int)(Mathf.Abs(x) / x);
+        }
+
+        #region Mesh Management
+        /// <summary>
+        /// Creates a mesh asset in the project's assets folder to save the baked mesh data.
+        /// </summary>
+        /// <param name="gridmapName"> The name to use to identify the meshes associated with a given gridmap.</param>
+        /// <param name="targetChunk">The chunk that this mesh will belong to.</param>
+        /// <param name="createdMesh">The created mesh.</param>
+        /// <param name="meshPath">The path in the assets folder that the mesh was saved to.</param>
+        /// <param name="subdirectory">An optional subdirectory specifier for organization.</param>
+        internal static void CreateMeshAsset(string gridmapName, MeshChunk targetChunk,
+            out Mesh createdMesh, out string meshPath, string subdirectory = "Scenes/GridmapMeshes")
+        {
+            Mesh mesh = new Mesh();
+            mesh.MarkDynamic();
+
+            // Store the mesh files in a subfolder with the gridmap's name (just the scene name probably).
+            subdirectory = System.IO.Path.Join(subdirectory, gridmapName);
+            string filePath = System.IO.Path.Join(ASSET_FOLDER, subdirectory, gridmapName +
+                targetChunk.Position.ToString() + MESH_FILE_EXTENSION);
+
+            // Assign out variables.
+            meshPath = filePath;
+            createdMesh = mesh;
+
+#if UNITY_EDITOR
+            UnityEditor.AssetDatabase.CreateAsset(mesh, filePath);
+#endif
+        }
+
+        #endregion
     }
 }

@@ -4,7 +4,7 @@
 // Creation Date : 12/15/2025
 // Last Modified : 12/15/2025
 //
-// Brief Description : Base editor for the Gridmap brush.
+// Brief Description : Base editor for brushes that paint on the gridmap.
 *****************************************************************************/
 using System.Linq;
 using UnityEditor;
@@ -15,10 +15,10 @@ using UnityEngine.Tilemaps;
 
 namespace Gridmap.Brushes.Editor
 {
-    [CustomEditor(typeof(GridmapBrush), true)]
+    [CustomEditor(typeof(GridmapBrushBase), true)]
     public class GridmapBrushBaseEditor : GridBrushEditorBase
     {
-        public GridmapBrush targetBrush { get { return target as GridmapBrush; } }
+        public GridmapBrushBase targetBrush { get { return target as GridmapBrushBase; } }
 
         /// <summary>
         /// The collection of GameObjects that hold tilemaps that this brush can paint on.  
@@ -35,9 +35,9 @@ namespace Gridmap.Brushes.Editor
                     GameObject gameObject;
                     return (gameObject = x.gameObject).scene.isLoaded
                            && gameObject.activeInHierarchy
-                           && !gameObject.hideFlags.HasFlag(HideFlags.NotEditable);
-                           // Only get tilemaps that are childed to a tilemap 3D.
-                           //&& gameObject.transform.parent.TryGetComponent(out VoxelTilemap3D tilemap3D);
+                           && !gameObject.hideFlags.HasFlag(HideFlags.NotEditable)
+                           // Only get tilemaps that have a Gridmap component on them.
+                           && gameObject.TryGetComponent(out Gridmap gmap);
                 }).Select(x => x.gameObject).ToArray();
             }
         }
@@ -59,13 +59,14 @@ namespace Gridmap.Brushes.Editor
         /// </summary>
         public override void OnInspectorGUI()
         {
-            //base.OnInspectorGUI();
+            
             serializedObject.Update();
 
-            EditorGUILayout.PropertyField(brushElevation);
+            //EditorGUILayout.PropertyField(brushElevation);
+            base.OnInspectorGUI();
 
             // Update the position of the tilemap based on the brushElevation.
-            
+
             // Add a space to separate custom data from the default brush properties.
             EditorGUILayout.Space();
             serializedObject.ApplyModifiedProperties();

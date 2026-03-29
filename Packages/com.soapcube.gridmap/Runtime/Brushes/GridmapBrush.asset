@@ -9,8 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b96a2bfc68fd16943a14c912b9e5cbd0, type: 3}
+  m_Script: {fileID: 11500000, guid: 7278e90902e6049448d13106f8d6db9a, type: 3}
   m_Name: GridmapBrush
   m_EditorClassIdentifier: soapcube.gridmap::Gridmap.Brushes.GridmapBrush
   autoUpdateElevation: 0
   brushElevation: 0
+  testTile: {fileID: 11400000, guid: 1f4a2f0f5cd600f488df2930dfecdd59, type: 2}
