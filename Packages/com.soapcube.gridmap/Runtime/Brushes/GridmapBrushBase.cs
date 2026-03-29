@@ -58,6 +58,8 @@ namespace Gridmap.Brushes
         /// <param name="position">The position that was painted on. </param>
         public override void Erase(GridLayout gridLayout, GameObject brushTarget, Vector3Int position)
         {
+            // Offset position based on the brushElevation since it isn't applied automatically.
+            position.z += brushElevation;
             // Reuse the BoxErase function to erase a singular tile.
             BoundsInt bounds = new BoundsInt(position, DEFAULT_CELL_SIZE);
             BoxErase(gridLayout, brushTarget, bounds);
@@ -72,9 +74,6 @@ namespace Gridmap.Brushes
         /// <param name="position">The positions painted on by the grid brush.</param>
         public override void BoxFill(GridLayout gridLayout, GameObject brushTarget, BoundsInt position)
         {
-            // Base BoxFill just runs paint on each position in the bounds.  Causes lag.
-            //base.BoxFill(gridLayout, brushTarget, position);
-
             // Get tilemap reference.  Currently, I'm assuming it goes with the tilemap component.
             if (brushTarget == null) { return; }
             if (!brushTarget.TryGetComponent(out Gridmap gridmap)) { return; }
@@ -87,7 +86,6 @@ namespace Gridmap.Brushes
                 Vector3Int swizzPos = GridmapHelpers.ConvertSwizzleSpace(pos, gridLayout.cellSwizzle);
 
                 // Actual painting implementation goes here.
-                //Debug.Log("Painted the tile " + GetMeshTile() + " at position " + swizzPos);
                 gridmap.PlaceTileAtPoint(GetMeshTile(), swizzPos);
             }
 
@@ -97,9 +95,6 @@ namespace Gridmap.Brushes
 
         public override void BoxErase(GridLayout gridLayout, GameObject brushTarget, BoundsInt position)
         {
-            // Base BoxErase just runs erase on each position in the bounds.  Causes lag.
-            //base.BoxErase(gridLayout, brushTarget, position);
-
             // Get tilemap reference.
             if (brushTarget == null) { return; }
             if (!brushTarget.TryGetComponent(out Gridmap gridmap)) { return; }
@@ -111,8 +106,6 @@ namespace Gridmap.Brushes
                 // ortientation.
                 Vector3Int swizzPos = GridmapHelpers.ConvertSwizzleSpace(pos, gridLayout.cellSwizzle);
 
-                // Actual painting implementation goes here.
-                //Debug.Log("Erased the tile at position " + swizzPos);
                 gridmap.PlaceTileAtPoint(null, swizzPos);
             }
 
