@@ -10,8 +10,8 @@ using UnityEngine;
 
 namespace Gridmap
 {
-    [CreateAssetMenu(fileName = "MeshTileTest", menuName = "Gridmap/Mesh Tile Test")]
-    public class MeshTileTest : MeshTileBase
+    [CreateAssetMenu(fileName = "MeshTile", menuName = "Gridmap/Mesh Tile")]
+    public class MeshTile : GridTileBase
     {
         [SerializeField] private Mesh testMesh;
 

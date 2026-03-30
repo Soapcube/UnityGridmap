@@ -59,7 +59,6 @@ namespace Gridmap.Brushes.Editor
         /// </summary>
         public override void OnInspectorGUI()
         {
-            
             serializedObject.Update();
 
             //EditorGUILayout.PropertyField(brushElevation);
@@ -100,7 +99,7 @@ namespace Gridmap.Brushes.Editor
                     break;
             }
             pos *= brushElevation;
-            tilemapTarget.transform.position = pos;
+            tilemapTarget.transform.localPosition = pos;
         }
 
         /// <summary>

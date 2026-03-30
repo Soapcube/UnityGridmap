@@ -16,7 +16,7 @@ namespace Gridmap
     internal class MeshChunk
     {
         private Vector3Int position;
-        private MeshTileBase[] tilesInChunk;
+        private GridTileBase[] tilesInChunk;
 
         /// <summary>
         /// Size of the chunk
@@ -31,7 +31,7 @@ namespace Gridmap
         /// <summary>
         /// All the tiles within the chunk
         /// </summary>
-        public MeshTileBase[] TilesInChunk { get => tilesInChunk; set => tilesInChunk = value; }
+        public GridTileBase[] TilesInChunk { get => tilesInChunk; set => tilesInChunk = value; }
 
         /// <summary>
         /// Create a new MeshChunk
@@ -42,7 +42,7 @@ namespace Gridmap
         {
             this.position = position;
             //This doesn't matter but we always refer to X/Z/Y
-            tilesInChunk = new MeshTileBase[chunkSize.x * chunkSize.y * chunkSize.z];
+            tilesInChunk = new GridTileBase[chunkSize.x * chunkSize.y * chunkSize.z];
 
             this.chunkSize = chunkSize;
         }
@@ -52,7 +52,7 @@ namespace Gridmap
         /// </summary>
         /// <param name="pos">The position of the mesh inside the chunk</param>
         /// <returns></returns>
-        public MeshTileBase GetTile(Vector3Int pos)
+        public GridTileBase GetTile(Vector3Int pos)
         {
             int index = GetTileIndex(pos, chunkSize);
             return TilesInChunk[index];
@@ -63,7 +63,7 @@ namespace Gridmap
         /// </summary>
         /// <param name="tile">The tile to be set</param>
         /// <param name="pos">The position of the tile in gridmap space. (Not relative to the chunk)</param>
-        public void SetTile(MeshTileBase tile, Vector3Int pos)
+        public void SetTile(GridTileBase tile, Vector3Int pos)
         {
             int index = GetTileIndex(pos, chunkSize);
 
@@ -81,9 +81,9 @@ namespace Gridmap
         {
             //Wrap around to our tilemap, so we don't get out of range exceptions
             //This might be a bad idea but we'll see
-            pos.x = GridmapHelpers.Mod(pos.x, chunkSize.x);
-            pos.y = GridmapHelpers.Mod(pos.y, chunkSize.y);
-            pos.z = GridmapHelpers.Mod(pos.z, chunkSize.z);
+            pos.x = GridmapUtilities.Mod(pos.x, chunkSize.x);
+            pos.y = GridmapUtilities.Mod(pos.y, chunkSize.y);
+            pos.z = GridmapUtilities.Mod(pos.z, chunkSize.z);
             return pos;
         }
 
