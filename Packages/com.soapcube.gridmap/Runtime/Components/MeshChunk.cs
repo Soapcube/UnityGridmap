@@ -130,10 +130,20 @@ namespace Gridmap
             return index;
         }
 
-        private Vector3 GetPositionFromIndex(int index)
+        private Vector3Int GetPositionFromIndex(int index)
         {
-            Vector3 offset = Vector3.zero;
-            
+            Vector3Int offset = Vector3Int.zero;
+
+            offset.x = index % chunkSize.x;
+
+            index -= offset.x;
+            index /= chunkSize.x;
+
+            offset.y = index % chunkSize.y;
+
+            index -= offset.y;
+            index /= chunkSize.y;
+            offset.z = index;
 
             return offset;
         }
