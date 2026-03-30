@@ -1,5 +1,5 @@
 /*****************************************************************************
-// File Name : GridmapHelpers.cs
+// File Name : GridmapUtilities.cs
 // Author : Brandon Koederitz
 // Creation Date : 12/15/2025
 // Last Modified : 12/15/2025
@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Gridmap
 {
-    internal static class GridmapHelpers
+    public static class GridmapUtilities
     {
         #region CONSTS
         private const string ASSET_FOLDER = "Assets";
@@ -24,7 +24,7 @@ namespace Gridmap
         /// <param name="targetSwizzleMode">The swizzle mode to convert the position into.</param>
         /// <param name="baseSwizzleMode">The current swizzle mode of the position.</param>
         /// <returns>The position in the specified swizzle mode.</returns>
-        internal static Vector3Int ConvertSwizzleSpace(Vector3Int position, 
+        public static Vector3Int ConvertSwizzleSpace(Vector3Int position, 
             Grid.CellSwizzle targetSwizzleMode, 
             Grid.CellSwizzle baseSwizzleMode = Grid.CellSwizzle.XYZ)
         {
@@ -91,28 +91,6 @@ namespace Gridmap
         internal static int Mod(int x, int m)
         {
             return ((x % m) + m) % m;
-        }
-
-        /// <summary>
-        /// Gets the sign of a given number
-        /// </summary>
-        /// <param name="x">The number to get the sign of.</param>
-        /// <returns>-1, 0, or 1, depending ont the sign of the number.</returns>
-        internal static int GetSign(int x)
-        {
-            if (x == 0) { return 0; }
-            return Mathf.Abs(x) / x;
-        }
-
-        /// <summary>
-        /// Gets the sign of a given number
-        /// </summary>
-        /// <param name="x">The number to get the sign of.</param>
-        /// <returns>-1, 0, or 1, depending ont the sign of the number.</returns>
-        internal static int GetSign(float x)
-        {
-            if (x == 0) { return 0; }
-            return (int)(Mathf.Abs(x) / x);
         }
 
         #region Mesh Management

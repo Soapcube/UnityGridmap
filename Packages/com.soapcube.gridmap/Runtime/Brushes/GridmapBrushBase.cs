@@ -83,7 +83,7 @@ namespace Gridmap.Brushes
             {
                 // The position is always in XYZ notation relative to the orientation of the grid.  Convert to the world
                 // ortientation.
-                Vector3Int swizzPos = GridmapHelpers.ConvertSwizzleSpace(pos, gridLayout.cellSwizzle);
+                Vector3Int swizzPos = GridmapUtilities.ConvertSwizzleSpace(pos, gridLayout.cellSwizzle);
 
                 // Actual painting implementation goes here.
                 gridmap.PlaceTileAtPoint(GetMeshTile(), swizzPos);
@@ -104,7 +104,7 @@ namespace Gridmap.Brushes
             {
                 // The position is always in XYZ notation relative to the orientation of the grid.  Convert to the world
                 // ortientation.
-                Vector3Int swizzPos = GridmapHelpers.ConvertSwizzleSpace(pos, gridLayout.cellSwizzle);
+                Vector3Int swizzPos = GridmapUtilities.ConvertSwizzleSpace(pos, gridLayout.cellSwizzle);
 
                 gridmap.PlaceTileAtPoint(null, swizzPos);
             }

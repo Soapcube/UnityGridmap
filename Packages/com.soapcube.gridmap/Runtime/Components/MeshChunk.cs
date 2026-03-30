@@ -81,9 +81,9 @@ namespace Gridmap
         {
             //Wrap around to our tilemap, so we don't get out of range exceptions
             //This might be a bad idea but we'll see
-            pos.x = GridmapHelpers.Mod(pos.x, chunkSize.x);
-            pos.y = GridmapHelpers.Mod(pos.y, chunkSize.y);
-            pos.z = GridmapHelpers.Mod(pos.z, chunkSize.z);
+            pos.x = GridmapUtilities.Mod(pos.x, chunkSize.x);
+            pos.y = GridmapUtilities.Mod(pos.y, chunkSize.y);
+            pos.z = GridmapUtilities.Mod(pos.z, chunkSize.z);
             return pos;
         }
 
