@@ -15,6 +15,7 @@ namespace Gridmap
     {
         [SerializeField] private Mesh testMesh;
         [SerializeField] private Vector3 offset;
+        [SerializeField] private Material[] materials;
 
         internal override Vector3 Offset => offset;
 
@@ -25,6 +26,11 @@ namespace Gridmap
         public override Mesh GetMesh()
         {
             return testMesh;
+        }
+
+        public override Material[] GetMaterials()
+        {
+            return materials;
         }
     }
 }

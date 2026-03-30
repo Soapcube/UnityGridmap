@@ -7,6 +7,7 @@
 // Brief Description : Stores data about the tiles in a certain chunk in the gridmap.
 *****************************************************************************/
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Gridmap
@@ -25,6 +26,7 @@ namespace Gridmap
         [SerializeField, ReadOnly] private Vector3Int chunkSize;
 
         [SerializeField, ShowIfNull] private MeshFilter meshFilter;
+        [SerializeField, ShowIfNull] private MeshRenderer meshRenderer;
 
 
         private Gridmap gridmap;
@@ -55,10 +57,11 @@ namespace Gridmap
         //    this.chunkSize = chunkSize;
         //}
 
-        internal void Initialize(Gridmap parentMap, Vector3Int position, Vector3Int chunkSize, MeshFilter mFilter)
+        internal void Initialize(Gridmap parentMap, Vector3Int position, Vector3Int chunkSize, MeshFilter mFilter, MeshRenderer mRenderer)
         {
             this.gridmap = parentMap;
             this.meshFilter = mFilter;
+            this.meshRenderer = mRenderer;
             this.position = position;
             transform.localPosition = position;
             //This doesn't matter but we always refer to X/Z/Y
@@ -166,7 +169,7 @@ namespace Gridmap
         public Mesh BakeMesh()
         {
             Mesh masterMesh = new();
-            List<CombineInstance> instances = new();
+            Dictionary<Material, List<CombineInstance>> instances = new();
             for (int i = 0; i < tilesInChunk.Length; i++)
             {
                 //Get the mesh and add it to our mesh
@@ -179,6 +182,31 @@ namespace Gridmap
 
                 Vector3 offset = gridmap.GridToCenteredPosition(GetPositionFromIndex(i)) + tilesInChunk[i].Offset;
 
+                if (tilesInChunk[i].GetMaterials() == null)
+                {
+                    continue;
+                }
+
+                foreach (Material material in tilesInChunk[i].GetMaterials())
+                {
+                    if (instances.ContainsKey(material))
+                    {
+                        continue;
+                    }
+                    instances.Add(material, new List<CombineInstance>());
+                }
+
+                for(int j = 0; j < tileMesh.subMeshCount; i++)
+                {
+                    //ToDo - turn submesh into mesh
+                    CombineInstance newInstance = new()
+                    {
+                        mesh = tileMesh,
+                        transform = Matrix4x4.Translate(offset),
+                    };
+                    instances[tilesInChunk[i].GetMaterials()[j]].Add(newInstance);
+                }
+
                 //So much math...This feels inefficient. I'll have to find a better way
                 //I found a better way
                 //Vector3[] offsetVertices = new Vector3[tileMesh.vertexCount];
@@ -187,16 +215,27 @@ namespace Gridmap
                 //    offsetVertices[j] = tileMesh.vertices[j] + offset;
                 //}
                 //tileMesh.vertices = offsetVertices;
-                CombineInstance newInstance = new CombineInstance
-                {
-                    mesh = tileMesh,
-                    transform = Matrix4x4.Translate(offset),
-                };
-
-                instances.Add(newInstance);
             }
 
-            masterMesh.CombineMeshes(instances.ToArray());
+            //masterMesh.CombineMeshes(instances.ToArray(), false);
+            //mesh = masterMesh;
+            //meshRenderer.SetMaterials(newMaterials);
+
+            List<CombineInstance> finalInstances = new();
+            foreach(List<CombineInstance> instance in instances.Values)
+            {
+                Mesh newMesh = new();
+                newMesh.CombineMeshes(instance.ToArray());
+
+                CombineInstance newInstance = new()
+                {
+                    mesh = newMesh
+                };
+                finalInstances.Add(newInstance);
+            }
+
+            masterMesh.CombineMeshes(finalInstances.ToArray(), false);
+            meshRenderer.SetMaterials(instances.Keys.ToList());
             mesh = masterMesh;
 
             return masterMesh;

@@ -101,7 +101,7 @@ namespace Gridmap
             MeshFilter mFilter = chunkGo.AddComponent<MeshFilter>();
             MeshRenderer mRend = chunkGo.AddComponent<MeshRenderer>();
 
-            chunk.Initialize(gridmap, chunkPosition, chunkSize, mFilter);
+            chunk.Initialize(gridmap, chunkPosition, chunkSize, mFilter, mRend);
             return chunk;
         }
 

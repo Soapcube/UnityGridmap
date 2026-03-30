@@ -7,8 +7,6 @@
 // Brief Description : Base class for mesh tiles that contain data about a mesh to paint on the gridmap.
 *****************************************************************************/
 
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace Gridmap
@@ -96,5 +94,7 @@ namespace Gridmap
         /// </summary>
         /// <returns></returns>
         public abstract Mesh GetMesh();
+
+        public abstract Material[] GetMaterials();
     }
 }
