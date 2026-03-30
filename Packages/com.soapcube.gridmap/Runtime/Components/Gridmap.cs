@@ -18,7 +18,7 @@ namespace Gridmap
     [RequireComponent(typeof(Tilemap))]
     public class Gridmap : MonoBehaviour
     {
-        [SerializeField] private MeshTileBase tile;
+        [SerializeField] private GridTileBase tile;
         /// <summary>
         /// Size of the chunks
         /// </summary>
@@ -101,7 +101,7 @@ namespace Gridmap
             MeshFilter mFilter = chunkGo.AddComponent<MeshFilter>();
             MeshRenderer mRend = chunkGo.AddComponent<MeshRenderer>();
 
-            chunk.Initialize(chunkPosition, chunkSize);
+            chunk.Initialize(chunkPosition, chunkSize, mFilter);
             return chunk;
         }
 
@@ -206,7 +206,7 @@ namespace Gridmap
 
             foreach(Vector3Int pos in rebakedChunks)
             {
-                //GetChunkByPosition(pos).BakeChunk();
+                GetChunkByPosition(pos).BakeChunk();
             }
         }
     }

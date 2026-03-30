@@ -23,6 +23,9 @@ namespace Gridmap
         /// Size of the chunk
         /// </summary>
         [SerializeField, ReadOnly] private Vector3Int chunkSize;
+
+        [SerializeField, ShowIfNull] private MeshFilter meshFilter;
+
         private Mesh mesh;
 
         /// <summary>
@@ -50,7 +53,7 @@ namespace Gridmap
         //    this.chunkSize = chunkSize;
         //}
 
-        internal void Initialize(Vector3Int position, Vector3Int chunkSize)
+        internal void Initialize(Vector3Int position, Vector3Int chunkSize, MeshFilter mFilter)
         {
             this.position = position;
             transform.localPosition = position;
@@ -135,6 +138,14 @@ namespace Gridmap
         }
 
         /// <summary>
+        /// Makes baked updates to this chunk after it is modified.
+        /// </summary>
+        public void BakeChunk()
+        {
+            meshFilter.sharedMesh = BakeMesh();
+        }
+
+        /// <summary>
         /// Bakes the mesh in a simple way
         /// </summary>
         /// <returns>The baked mesh also saves the baked mesh to the MeshChunk's Mesh property</returns>
@@ -145,6 +156,7 @@ namespace Gridmap
             for (int i = 0; i < tilesInChunk.Length; i++)
             {
                 //Get the mesh and add it to our mesh
+                if (tilesInChunk[i] == null) { continue; }
                 Mesh tileMesh = tilesInChunk[i].GetMesh();
                 Vector3 offset = GetPositionFromIndex(i);
 
