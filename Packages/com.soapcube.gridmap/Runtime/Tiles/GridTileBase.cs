@@ -16,11 +16,14 @@ namespace Gridmap
     public abstract class GridTileBase : ScriptableObject
     {
         [SerializeField] private Mesh mesh;
+        
 
         /// <summary>
         /// Mesh of the object
         /// </summary>
         public Mesh Mesh { get => mesh; }
+
+        internal virtual Vector3 Offset => Vector2.zero;
 
         /// <summary>
         /// Get the loop values in order to find duplicates

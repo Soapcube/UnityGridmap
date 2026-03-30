@@ -26,6 +26,8 @@ namespace Gridmap
 
         [SerializeField, ShowIfNull] private MeshFilter meshFilter;
 
+
+        private Gridmap gridmap;
         private Mesh mesh;
 
         /// <summary>
@@ -53,8 +55,9 @@ namespace Gridmap
         //    this.chunkSize = chunkSize;
         //}
 
-        internal void Initialize(Vector3Int position, Vector3Int chunkSize, MeshFilter mFilter)
+        internal void Initialize(Gridmap parentMap, Vector3Int position, Vector3Int chunkSize, MeshFilter mFilter)
         {
+            this.gridmap = parentMap;
             this.meshFilter = mFilter;
             this.position = position;
             transform.localPosition = position;
@@ -174,7 +177,7 @@ namespace Gridmap
                     continue;
                 }
 
-                Vector3 offset = GetPositionFromIndex(i);
+                Vector3 offset = gridmap.GridToCenteredPosition(GetPositionFromIndex(i)) + tilesInChunk[i].Offset;
 
                 //So much math...This feels inefficient. I'll have to find a better way
                 //I found a better way

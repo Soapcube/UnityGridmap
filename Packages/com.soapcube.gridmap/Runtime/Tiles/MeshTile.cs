@@ -14,6 +14,9 @@ namespace Gridmap
     public class MeshTile : GridTileBase
     {
         [SerializeField] private Mesh testMesh;
+        [SerializeField] private Vector3 offset;
+
+        internal override Vector3 Offset => offset;
 
         /// <summary>
         /// return specific mesh for testing.
