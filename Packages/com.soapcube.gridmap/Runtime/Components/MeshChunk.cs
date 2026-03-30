@@ -6,7 +6,7 @@
 //
 // Brief Description : Stores data about the tiles in a certain chunk in the gridmap.
 *****************************************************************************/
-using NUnit.Framework;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Gridmap
@@ -130,10 +130,20 @@ namespace Gridmap
             return index;
         }
 
-        private Vector3 GetPositionFromIndex(int index)
+        private Vector3Int GetPositionFromIndex(int index)
         {
-            Vector3 offset = Vector3.zero;
-            
+            Vector3Int offset = Vector3Int.zero;
+
+            offset.x = index % chunkSize.x;
+
+            index -= offset.x;
+            index /= chunkSize.x;
+
+            offset.y = index % chunkSize.y;
+
+            index -= offset.y;
+            index /= chunkSize.y;
+            offset.z = index;
 
             return offset;
         }
@@ -153,12 +163,17 @@ namespace Gridmap
         public Mesh BakeMesh()
         {
             Mesh masterMesh = new();
-            CombineInstance[] instances = new CombineInstance[TilesInChunk.Length];
+            List<CombineInstance> instances = new();
             for (int i = 0; i < tilesInChunk.Length; i++)
             {
                 //Get the mesh and add it to our mesh
                 if (tilesInChunk[i] == null) { continue; }
                 Mesh tileMesh = tilesInChunk[i].GetMesh();
+                if (tileMesh == null || tileMesh.vertices.Length == 0)
+                {
+                    continue;
+                }
+
                 Vector3 offset = GetPositionFromIndex(i);
 
                 //So much math...This feels inefficient. I'll have to find a better way
@@ -169,14 +184,16 @@ namespace Gridmap
                 //    offsetVertices[j] = tileMesh.vertices[j] + offset;
                 //}
                 //tileMesh.vertices = offsetVertices;
-                instances[i] = new CombineInstance
+                CombineInstance newInstance = new CombineInstance
                 {
                     mesh = tileMesh,
                     transform = Matrix4x4.Translate(offset),
                 };
+
+                instances.Add(newInstance);
             }
 
-            masterMesh.CombineMeshes(instances);
+            masterMesh.CombineMeshes(instances.ToArray());
             mesh = masterMesh;
 
             return masterMesh;
