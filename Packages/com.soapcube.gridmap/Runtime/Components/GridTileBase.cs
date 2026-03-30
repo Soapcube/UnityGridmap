@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace Gridmap
 {
-    public abstract class MeshTileBase : ScriptableObject
+    public abstract class GridTileBase : ScriptableObject
     {
         [SerializeField] private Mesh mesh;
 

@@ -52,7 +52,7 @@ namespace Gridmap
         /// </summary>
         /// <param name="tile">The tile going into the chunk</param>
         /// <param name="point">The point in grid space where the tile is going</param>
-        public void PlaceTileAtPoint(MeshTileBase tile, Vector3Int point)
+        public void PlaceTileAtPoint(GridTileBase tile, Vector3Int point)
         {
             Vector3Int chunkPosition = GetChunkPos(point);
 
@@ -73,7 +73,7 @@ namespace Gridmap
         /// </summary>
         /// <param name="pos">The position to get the tile at.</param>
         /// <returns>The tile at that position.  Null if no tile.</returns>
-        public MeshTileBase GetTileAtPoint(Vector3Int pos)
+        public GridTileBase GetTileAtPoint(Vector3Int pos)
         {
             MeshChunk chunk = GetChunkByPosition(GetChunkPos(pos));
             if (chunk == null) { return null; }
