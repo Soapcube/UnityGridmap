@@ -11,7 +11,7 @@ using UnityEngine.Tilemaps;
 
 namespace Gridmap
 {
-    public abstract class MeshTileBase : ScriptableObject
+    public abstract class GridTileBase : ScriptableObject
     {
         /// <summary>
         /// Gets the mesh to paint on the gridmap, taking into account any vertex/face removal or rules.
