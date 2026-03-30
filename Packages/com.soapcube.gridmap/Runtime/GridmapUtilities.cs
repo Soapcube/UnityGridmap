@@ -102,25 +102,25 @@ namespace Gridmap
         /// <param name="createdMesh">The created mesh.</param>
         /// <param name="meshPath">The path in the assets folder that the mesh was saved to.</param>
         /// <param name="subdirectory">An optional subdirectory specifier for organization.</param>
-        internal static void CreateMeshAsset(string gridmapName, MeshChunk targetChunk,
-            out Mesh createdMesh, out string meshPath, string subdirectory = "Scenes/GridmapMeshes")
-        {
-            Mesh mesh = new Mesh();
-            mesh.MarkDynamic();
+//        internal static void CreateMeshAsset(string gridmapName, MeshChunk targetChunk,
+//            out Mesh createdMesh, out string meshPath, string subdirectory = "Scenes/GridmapMeshes")
+//        {
+//            Mesh mesh = new Mesh();
+//            mesh.MarkDynamic();
 
-            // Store the mesh files in a subfolder with the gridmap's name (just the scene name probably).
-            subdirectory = System.IO.Path.Join(subdirectory, gridmapName);
-            string filePath = System.IO.Path.Join(ASSET_FOLDER, subdirectory, gridmapName +
-                targetChunk.Position.ToString() + MESH_FILE_EXTENSION);
+//            // Store the mesh files in a subfolder with the gridmap's name (just the scene name probably).
+//            subdirectory = System.IO.Path.Join(subdirectory, gridmapName);
+//            string filePath = System.IO.Path.Join(ASSET_FOLDER, subdirectory, gridmapName +
+//                targetChunk.Position.ToString() + MESH_FILE_EXTENSION);
 
-            // Assign out variables.
-            meshPath = filePath;
-            createdMesh = mesh;
+//            // Assign out variables.
+//            meshPath = filePath;
+//            createdMesh = mesh;
 
-#if UNITY_EDITOR
-            UnityEditor.AssetDatabase.CreateAsset(mesh, filePath);
-#endif
-        }
+//#if UNITY_EDITOR
+//            UnityEditor.AssetDatabase.CreateAsset(mesh, filePath);
+//#endif
+//        }
 
         #endregion
     }
