@@ -2,10 +2,11 @@
 // File Name : MeshChunk.cs
 // Author : Lucas Fehlberg
 // Creation Date : 12/22/2025
-// Last Modified : 12/23/2025
+// Last Modified : 3/25/2026
 //
 // Brief Description : Stores data about the tiles in a certain chunk in the gridmap.
 *****************************************************************************/
+using NUnit.Framework;
 using UnityEngine;
 
 namespace Gridmap
@@ -22,6 +23,7 @@ namespace Gridmap
         /// Size of the chunk
         /// </summary>
         [SerializeField, ReadOnly] private Vector3Int chunkSize;
+        private Mesh mesh;
 
         /// <summary>
         /// Position of the Mesh Chunk
@@ -31,6 +33,7 @@ namespace Gridmap
         /// <summary>
         /// All the tiles within the chunk
         /// </summary>
+        public Mesh Mesh { get => mesh; }
         public GridTileBase[] TilesInChunk { get => tilesInChunk; set => tilesInChunk = value; }
 
         /// <summary>
@@ -55,6 +58,7 @@ namespace Gridmap
             tilesInChunk = new GridTileBase[chunkSize.x * chunkSize.y * chunkSize.z];
 
             this.chunkSize = chunkSize;
+            mesh = new Mesh();
         }
 
         /// <summary>
@@ -80,6 +84,12 @@ namespace Gridmap
             // Debug to prove that adding tiles works.
             Debug.Log("Set the tile at position " + pos + " in chunk position " + position + " to the tile  " + tile);
             TilesInChunk[index] = tile;
+
+            ////If we have no loop connections, set some up
+            //if (TilesInChunk[index].LoopConnections.Count == 0)
+            //{
+            //    TilesInChunk[index].SetupLoopConnections();
+            //}
         }
 
         /// <summary>
@@ -105,8 +115,58 @@ namespace Gridmap
         /// <returns>The index of that cell in the chunk.</returns>
         private static int GetTileIndex(Vector3Int pos, Vector3Int chunkSize)
         {
-            pos = GetChunkRelativePos(pos, chunkSize);
-            return pos.x + (pos.y * chunkSize.x) + (pos.z * chunkSize.x * chunkSize.y);
+            //Wrap around to our tilemap, so we don't get out of range exceptions
+            //This might be a bad idea but we'll see
+            pos.x %= chunkSize.x;
+            pos.y %= chunkSize.y;
+            pos.z %= chunkSize.z;
+
+            int index = pos.x + (pos.y * chunkSize.x) + (pos.z * chunkSize.x * chunkSize.y);
+
+            return index;
+        }
+
+        private Vector3 GetPositionFromIndex(int index)
+        {
+            Vector3 offset = Vector3.zero;
+            
+
+            return offset;
+        }
+
+        /// <summary>
+        /// Bakes the mesh in a simple way
+        /// </summary>
+        /// <returns>The baked mesh also saves the baked mesh to the MeshChunk's Mesh property</returns>
+        public Mesh BakeMesh()
+        {
+            Mesh masterMesh = new();
+            CombineInstance[] instances = new CombineInstance[TilesInChunk.Length];
+            for (int i = 0; i < tilesInChunk.Length; i++)
+            {
+                //Get the mesh and add it to our mesh
+                Mesh tileMesh = tilesInChunk[i].GetMesh();
+                Vector3 offset = GetPositionFromIndex(i);
+
+                //So much math...This feels inefficient. I'll have to find a better way
+                //I found a better way
+                //Vector3[] offsetVertices = new Vector3[tileMesh.vertexCount];
+                //for(int j = 0; j < tileMesh.vertexCount; j++)
+                //{
+                //    offsetVertices[j] = tileMesh.vertices[j] + offset;
+                //}
+                //tileMesh.vertices = offsetVertices;
+                instances[i] = new CombineInstance
+                {
+                    mesh = tileMesh,
+                    transform = Matrix4x4.Translate(offset),
+                };
+            }
+
+            masterMesh.CombineMeshes(instances);
+            mesh = masterMesh;
+
+            return masterMesh;
         }
     }
 }
