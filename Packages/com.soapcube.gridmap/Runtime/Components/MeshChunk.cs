@@ -14,15 +14,18 @@ namespace Gridmap
     /// <summary>
     /// The chunks used in the Gridmap Class
     /// </summary>
-    internal class MeshChunk
+    internal class MeshChunk : MonoBehaviour
     {
-        private Vector3Int position;
-        private GridTileBase[] tilesInChunk;
+        [SerializeField, ReadOnly] private Vector3Int position;
+        [SerializeField, HideInInspector] private GridTileBase[] tilesInChunk;
 
         /// <summary>
         /// Size of the chunk
         /// </summary>
-        private Vector3Int chunkSize;
+        [SerializeField, ReadOnly] private Vector3Int chunkSize;
+
+        [SerializeField, ShowIfNull] private MeshFilter meshFilter;
+
         private Mesh mesh;
 
         /// <summary>
@@ -41,9 +44,19 @@ namespace Gridmap
         /// </summary>
         /// <param name="position">Position of the Chunk, also the position of index 0</param>
         /// <param name="chunkSize">Size of the chunk, constant for all chunks. All values must be greater than 0</param>
-        public MeshChunk(Vector3Int position, Vector3Int chunkSize)
+        //public MeshChunk(Vector3Int position, Vector3Int chunkSize)
+        //{
+        //    this.position = position;
+        //    //This doesn't matter but we always refer to X/Z/Y
+        //    tilesInChunk = new GridTileBase[chunkSize.x * chunkSize.y * chunkSize.z];
+
+        //    this.chunkSize = chunkSize;
+        //}
+
+        internal void Initialize(Vector3Int position, Vector3Int chunkSize, MeshFilter mFilter)
         {
             this.position = position;
+            transform.localPosition = position;
             //This doesn't matter but we always refer to X/Z/Y
             tilesInChunk = new GridTileBase[chunkSize.x * chunkSize.y * chunkSize.z];
 
@@ -73,7 +86,6 @@ namespace Gridmap
 
             // Debug to prove that adding tiles works.
             Debug.Log("Set the tile at position " + pos + " in chunk position " + position + " to the tile  " + tile);
-
             TilesInChunk[index] = tile;
 
             ////If we have no loop connections, set some up
@@ -126,6 +138,14 @@ namespace Gridmap
         }
 
         /// <summary>
+        /// Makes baked updates to this chunk after it is modified.
+        /// </summary>
+        public void BakeChunk()
+        {
+            meshFilter.sharedMesh = BakeMesh();
+        }
+
+        /// <summary>
         /// Bakes the mesh in a simple way
         /// </summary>
         /// <returns>The baked mesh also saves the baked mesh to the MeshChunk's Mesh property</returns>
@@ -136,6 +156,7 @@ namespace Gridmap
             for (int i = 0; i < tilesInChunk.Length; i++)
             {
                 //Get the mesh and add it to our mesh
+                if (tilesInChunk[i] == null) { continue; }
                 Mesh tileMesh = tilesInChunk[i].GetMesh();
                 Vector3 offset = GetPositionFromIndex(i);
 
