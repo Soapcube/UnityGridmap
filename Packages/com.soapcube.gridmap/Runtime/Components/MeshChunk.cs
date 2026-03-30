@@ -55,6 +55,7 @@ namespace Gridmap
 
         internal void Initialize(Vector3Int position, Vector3Int chunkSize, MeshFilter mFilter)
         {
+            this.meshFilter = mFilter;
             this.position = position;
             transform.localPosition = position;
             //This doesn't matter but we always refer to X/Z/Y
