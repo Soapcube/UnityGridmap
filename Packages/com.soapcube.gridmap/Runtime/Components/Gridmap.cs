@@ -66,7 +66,7 @@ namespace Gridmap
             if (chunk == null)
             {
                 //chunk = new(chunkPosition, chunkSize);
-                chunk = CreateNewChunk(transform, chunkPosition);
+                chunk = CreateNewChunk(this, chunkPosition);
                 chunks.Add(chunk);
             }
 
@@ -90,18 +90,18 @@ namespace Gridmap
         /// <summary>
         /// Creates a new chunk with a given parent Gridmap
         /// </summary>
-        /// <param name="parent">The transform of thet GridMap to child this chunk to.</param>
+        /// <param name="gridmap">The transform of thet GridMap to child this chunk to.</param>
         /// <param name="chunkPosition">The position to spawn the chunk at.</param>
         /// <returns>The created MeshChunk</returns>
-        private static MeshChunk CreateNewChunk(Transform parent, Vector3Int chunkPosition)
+        private static MeshChunk CreateNewChunk(Gridmap gridmap, Vector3Int chunkPosition)
         {
             GameObject chunkGo = new GameObject($"Chunk ({chunkPosition.x}, {chunkPosition.y}, {chunkPosition.z}) ");
-            chunkGo.transform.SetParent(parent);
+            chunkGo.transform.SetParent(gridmap.transform);
             MeshChunk chunk = chunkGo.AddComponent<MeshChunk>();
             MeshFilter mFilter = chunkGo.AddComponent<MeshFilter>();
             MeshRenderer mRend = chunkGo.AddComponent<MeshRenderer>();
 
-            chunk.Initialize(chunkPosition, chunkSize, mFilter);
+            chunk.Initialize(gridmap, chunkPosition, chunkSize, mFilter);
             return chunk;
         }
 
