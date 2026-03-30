@@ -7,8 +7,11 @@
 // Brief Description : 3D tile based system for creating 3D envirobnments from multiple mesh tiles.
 *****************************************************************************/
 using System.Collections.Generic;
+using System.Drawing;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEngine.UIElements;
 
 namespace Gridmap
 {
@@ -18,15 +21,17 @@ namespace Gridmap
         /// <summary>
         /// Size of the chunks
         /// </summary>
-        private readonly Vector3Int chunkSize = new(16, 16, 16);
+        private static readonly Vector3Int chunkSize = new(16, 16, 16);
 
         /// <summary>
         /// The chunks in this map
         /// </summary>
-        private List<MeshChunk> chunks = new();
+        [SerializeField] private List<MeshChunk> chunks = new();
+
+        
 
         #region Component References
-        [SerializeReference, HideInInspector] private Tilemap tilemap;
+        [SerializeReference, ShowIfNull] private Tilemap tilemap;
         /// <summary>
         /// Get Component references automatically on component reset.
         /// </summary>
@@ -50,7 +55,8 @@ namespace Gridmap
             //If the chunk is null, we'll simply make a new chunk and add it to the list
             if (chunk == null)
             {
-                chunk = new(chunkPosition, chunkSize);
+                //chunk = new(chunkPosition, chunkSize);
+                chunk = CreateNewChunk(transform, chunkPosition);
                 chunks.Add(chunk);
             }
 
@@ -65,12 +71,30 @@ namespace Gridmap
         /// <returns>The tile at that position.  Null if no tile.</returns>
         public GridTileBase GetTileAtPoint(Vector3Int pos)
         {
-            MeshChunk chunk = GetChunkByPosition(GetChunkPos(pos));
+            MeshChunk chunk = GetChunkByPosition(pos);
             if (chunk == null) { return null; }
             return chunk.GetTile(pos);
         }
 
         #region Chunks
+        /// <summary>
+        /// Creates a new chunk with a given parent Gridmap
+        /// </summary>
+        /// <param name="parent">The transform of thet GridMap to child this chunk to.</param>
+        /// <param name="chunkPosition">The position to spawn the chunk at.</param>
+        /// <returns>The created MeshChunk</returns>
+        private static MeshChunk CreateNewChunk(Transform parent, Vector3Int chunkPosition)
+        {
+            GameObject chunkGo = new GameObject($"Chunk ({chunkPosition.x}, {chunkPosition.y}, {chunkPosition.z}) ");
+            chunkGo.transform.SetParent(parent);
+            MeshChunk chunk = chunkGo.AddComponent<MeshChunk>();
+            MeshFilter mFilter = chunkGo.AddComponent<MeshFilter>();
+            MeshRenderer mRend = chunkGo.AddComponent<MeshRenderer>();
+
+            chunk.Initialize(chunkPosition, chunkSize);
+            return chunk;
+        }
+
         /// <summary>
         /// Gets the chunk at this position
         /// </summary>
@@ -99,8 +123,7 @@ namespace Gridmap
         #endregion
 
         #region Position Conversions
-        // All of these take the settings of the gridLayout into account so that if the grid gets modified they'll
-        // return accurate values.  I can simplify this down if needed. -Brandon
+        // Need to double check these.
 
         /// <summary>
         /// Gets the world position of a given cell in the grid.
@@ -154,7 +177,27 @@ namespace Gridmap
         /// it could be used to know what chunks to bake.</param>
         public void BakeMesh(BoundsInt editedBounds)
         {
-           
+            List<Vector3Int> rebakedChunks = new List<Vector3Int>();
+            // Loop through all filled positions
+            foreach (Vector3Int pos in editedBounds.allPositionsWithin)
+            {
+                // The position is always in XYZ notation relative to the orientation of the grid.  Convert to the world
+                // ortientation.
+                Vector3Int swizzPos = GridmapUtilities.ConvertSwizzleSpace(pos, tilemap.layoutGrid.cellSwizzle);
+
+                Vector3Int chunkPosition = GetChunkPos(swizzPos);
+                if (!rebakedChunks.Contains(chunkPosition))
+                {
+                    rebakedChunks.Add(chunkPosition);
+                }
+
+                // Also check for rebaking adjacent chunks later when we implement rule tiles.
+            }
+
+            foreach(Vector3Int pos in rebakedChunks)
+            {
+                //GetChunkByPosition(pos).BakeChunk();
+            }
         }
     }
 }

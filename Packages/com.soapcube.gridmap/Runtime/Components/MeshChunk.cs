@@ -13,15 +13,15 @@ namespace Gridmap
     /// <summary>
     /// The chunks used in the Gridmap Class
     /// </summary>
-    internal class MeshChunk
+    internal class MeshChunk : MonoBehaviour
     {
-        private Vector3Int position;
-        private GridTileBase[] tilesInChunk;
+        [SerializeField, ReadOnly] private Vector3Int position;
+        [SerializeField, HideInInspector] private GridTileBase[] tilesInChunk;
 
         /// <summary>
         /// Size of the chunk
         /// </summary>
-        private Vector3Int chunkSize;
+        [SerializeField, ReadOnly] private Vector3Int chunkSize;
 
         /// <summary>
         /// Position of the Mesh Chunk
@@ -38,9 +38,19 @@ namespace Gridmap
         /// </summary>
         /// <param name="position">Position of the Chunk, also the position of index 0</param>
         /// <param name="chunkSize">Size of the chunk, constant for all chunks. All values must be greater than 0</param>
-        public MeshChunk(Vector3Int position, Vector3Int chunkSize)
+        //public MeshChunk(Vector3Int position, Vector3Int chunkSize)
+        //{
+        //    this.position = position;
+        //    //This doesn't matter but we always refer to X/Z/Y
+        //    tilesInChunk = new GridTileBase[chunkSize.x * chunkSize.y * chunkSize.z];
+
+        //    this.chunkSize = chunkSize;
+        //}
+
+        internal void Initialize(Vector3Int position, Vector3Int chunkSize)
         {
             this.position = position;
+            transform.localPosition = position;
             //This doesn't matter but we always refer to X/Z/Y
             tilesInChunk = new GridTileBase[chunkSize.x * chunkSize.y * chunkSize.z];
 
@@ -68,7 +78,7 @@ namespace Gridmap
             int index = GetTileIndex(pos, chunkSize);
 
             // Debug to prove that adding tiles works.
-            //Debug.Log("Set the tile at position " + pos + " in chunk position " + position + " to the tile  " + tile);
+            Debug.Log("Set the tile at position " + pos + " in chunk position " + position + " to the tile  " + tile);
             TilesInChunk[index] = tile;
         }
 
