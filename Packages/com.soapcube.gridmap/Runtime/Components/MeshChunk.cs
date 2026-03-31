@@ -26,6 +26,7 @@ namespace Gridmap
         [SerializeField, ReadOnly] private Vector3Int chunkSize;
 
         [SerializeField, ShowIfNull] private MeshFilter meshFilter;
+        [SerializeField, ShowIfNull] private MeshRenderer meshRenderer;
 
 
         [SerializeField, ShowIfNull] private Gridmap gridmap;
@@ -56,10 +57,11 @@ namespace Gridmap
         //    this.chunkSize = chunkSize;
         //}
 
-        internal void Initialize(Gridmap parentMap, Vector3Int position, Vector3Int chunkSize, MeshFilter mFilter)
+        internal void Initialize(Gridmap parentMap, Vector3Int position, Vector3Int chunkSize, MeshFilter mFilter, MeshRenderer mRend)
         {
             this.gridmap = parentMap;
             this.meshFilter = mFilter;
+            this.meshRenderer = mRend;
             this.position = position;
             transform.localPosition = position;
             //This doesn't matter but we always refer to X/Z/Y
@@ -212,24 +214,24 @@ namespace Gridmap
             {
                 return null;
             }
-            List<CombineInstance> finalInstance = new List<CombineInstance>();
+            List<CombineInstance> finalInstance = new();
             foreach (List<CombineInstance> instance in instances.Values)
             {
                 Mesh newInstance = new();
                 newInstance.CombineMeshes(instance.ToArray(), true);
-                Debug.Log(newInstance);
 
                 CombineInstance nextInstance = new()
                 {
                     mesh = newInstance,
-                    transform = new()
+                    transform = Matrix4x4.identity,
                 };
                 finalInstance.Add(nextInstance);
             }
-            masterMesh = finalInstance[0].mesh;
+            //masterMesh = finalInstance[0].mesh;
             //masterMesh.CombineMeshes(instances[instances.Keys.First()].ToArray(), true, true);
-            //masterMesh.CombineMeshes(finalInstance.ToArray(), true);
+            masterMesh.CombineMeshes(finalInstance.ToArray(), false);
             mesh = masterMesh;
+            meshRenderer.SetMaterials(instances.Keys.ToList());
 
             return masterMesh;
         }
