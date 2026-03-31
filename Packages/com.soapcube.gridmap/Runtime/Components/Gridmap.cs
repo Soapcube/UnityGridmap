@@ -74,6 +74,11 @@ namespace Gridmap
             chunk.SetTile(tile, point - chunkPosition);
         }
 
+        internal void RemoveChunk(MeshChunk chunk)
+        {
+            chunks.Remove(chunk);
+        }
+
         /// <summary>
         /// Gets the tile at a given position.
         /// </summary>

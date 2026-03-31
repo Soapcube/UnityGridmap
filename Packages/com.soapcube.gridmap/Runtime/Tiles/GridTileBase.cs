@@ -96,5 +96,7 @@ namespace Gridmap
         /// </summary>
         /// <returns></returns>
         public abstract Mesh GetMesh();
+
+        public abstract Material[] GetMaterials();
     }
 }
