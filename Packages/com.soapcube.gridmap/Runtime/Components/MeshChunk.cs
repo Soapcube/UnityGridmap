@@ -226,7 +226,8 @@ namespace Gridmap
                 };
                 finalInstance.Add(nextInstance);
             }
-            masterMesh.CombineMeshes(instances[instances.Keys.First()].ToArray(), true, true);
+            masterMesh = finalInstance[0].mesh;
+            //masterMesh.CombineMeshes(instances[instances.Keys.First()].ToArray(), true, true);
             //masterMesh.CombineMeshes(finalInstance.ToArray(), true);
             mesh = masterMesh;
 
