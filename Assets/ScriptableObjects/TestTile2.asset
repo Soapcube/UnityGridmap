@@ -16,4 +16,4 @@ MonoBehaviour:
   testMesh: {fileID: -2432090755550338912, guid: c3f755e2a5d7b924484512308476504a, type: 3}
   offset: {x: 0, y: -1, z: 0}
   materials:
-  - {fileID: 2100000, guid: c2e40fa84d53ccd428f640eac126b1fb, type: 2}
+  - {fileID: 2100000, guid: 4f1ef37ae953c484bbc5d5e4049147e5, type: 2}
