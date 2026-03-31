@@ -7,6 +7,7 @@
 // Brief Description : Stores data about the tiles in a certain chunk in the gridmap.
 *****************************************************************************/
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Gridmap
@@ -27,7 +28,7 @@ namespace Gridmap
         [SerializeField, ShowIfNull] private MeshFilter meshFilter;
 
 
-        private Gridmap gridmap;
+        [SerializeField, ShowIfNull] private Gridmap gridmap;
         private Mesh mesh;
 
         /// <summary>
@@ -156,6 +157,13 @@ namespace Gridmap
         /// </summary>
         public void BakeChunk()
         {
+            Mesh myMesh = BakeMesh();
+            if(myMesh == null)
+            {
+                gridmap.RemoveChunk(this);
+                DestroyImmediate(gameObject);
+                return;
+            }
             meshFilter.sharedMesh = BakeMesh();
         }
 
@@ -166,7 +174,7 @@ namespace Gridmap
         public Mesh BakeMesh()
         {
             Mesh masterMesh = new();
-            List<CombineInstance> instances = new();
+            Dictionary<Material, List<CombineInstance>> instances = new();
             for (int i = 0; i < tilesInChunk.Length; i++)
             {
                 //Get the mesh and add it to our mesh
@@ -178,6 +186,11 @@ namespace Gridmap
                 }
 
                 Vector3 offset = gridmap.GridToCenteredPosition(GetPositionFromIndex(i)) + tilesInChunk[i].Offset;
+                Material[] materials = tilesInChunk[i].GetMaterials();
+                if (!instances.ContainsKey(materials[0]))
+                {
+                    instances.Add(materials[0], new());
+                }
 
                 //So much math...This feels inefficient. I'll have to find a better way
                 //I found a better way
@@ -187,16 +200,34 @@ namespace Gridmap
                 //    offsetVertices[j] = tileMesh.vertices[j] + offset;
                 //}
                 //tileMesh.vertices = offsetVertices;
-                CombineInstance newInstance = new CombineInstance
+                CombineInstance newInstance = new()
                 {
                     mesh = tileMesh,
                     transform = Matrix4x4.Translate(offset),
                 };
 
-                instances.Add(newInstance);
+                instances[materials[0]].Add(newInstance);
             }
+            if(instances.Count == 0)
+            {
+                return null;
+            }
+            List<CombineInstance> finalInstance = new List<CombineInstance>();
+            foreach (List<CombineInstance> instance in instances.Values)
+            {
+                Mesh newInstance = new();
+                newInstance.CombineMeshes(instance.ToArray(), true);
+                Debug.Log(newInstance);
 
-            masterMesh.CombineMeshes(instances.ToArray());
+                CombineInstance nextInstance = new()
+                {
+                    mesh = newInstance,
+                    transform = new()
+                };
+                finalInstance.Add(nextInstance);
+            }
+            masterMesh.CombineMeshes(instances[instances.Keys.First()].ToArray(), true, true);
+            //masterMesh.CombineMeshes(finalInstance.ToArray(), true);
             mesh = masterMesh;
 
             return masterMesh;
