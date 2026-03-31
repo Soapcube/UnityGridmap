@@ -40,6 +40,7 @@ namespace Gridmap
                 GetComponent<MeshFilter>().mesh = chunk.Mesh;
             }
         }
+
         #region Component References
         [SerializeReference, ShowIfNull] private Tilemap tilemap;
         /// <summary>
@@ -134,6 +135,17 @@ namespace Gridmap
                 chunkPosition[index] = Mathf.FloorToInt(thingToFloor) * chunkSize[index];
             }
             return chunkPosition;
+        }
+
+        /// <summary>
+        /// Rebakes all chunks in this Gridmap.
+        /// </summary>
+        public void BakeAllChunks()
+        {
+            foreach(var chunk in chunks)
+            {
+                chunk.BakeChunk();
+            }
         }
         #endregion
 
