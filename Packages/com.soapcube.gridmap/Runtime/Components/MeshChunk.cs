@@ -29,6 +29,9 @@ namespace Gridmap
 
 
         [SerializeField, ShowIfNull] private Gridmap gridmap;
+
+        [SerializeField, ReadOnly] private int tileNum;
+
         private Mesh mesh;
 
         /// <summary>
@@ -58,15 +61,21 @@ namespace Gridmap
 
         internal void Initialize(Gridmap parentMap, Vector3Int position, Vector3Int chunkSize, MeshFilter mFilter)
         {
+            gameObject.hideFlags = HideFlags.NotEditable;
             this.gridmap = parentMap;
             this.meshFilter = mFilter;
             this.position = position;
-            transform.localPosition = position;
+            transform.localPosition = GridmapUtilities.GetChunkLocalPosition(position, chunkSize);
             //This doesn't matter but we always refer to X/Z/Y
             tilesInChunk = new GridTileBase[chunkSize.x * chunkSize.y * chunkSize.z];
 
             this.chunkSize = chunkSize;
             mesh = new Mesh();
+        }
+
+        internal bool IsEmpty()
+        {
+            return tileNum == 0;
         }
 
         /// <summary>
@@ -76,7 +85,7 @@ namespace Gridmap
         /// <returns></returns>
         public GridTileBase GetTile(Vector3Int pos)
         {
-            int index = GetTileIndex(pos, chunkSize);
+            int index = GridmapUtilities.PosToIndex(pos, chunkSize);
             return TilesInChunk[index];
         }
 
@@ -87,11 +96,13 @@ namespace Gridmap
         /// <param name="pos">The position of the tile in gridmap space. (Not relative to the chunk)</param>
         public void SetTile(GridTileBase tile, Vector3Int pos)
         {
-            int index = GetTileIndex(pos, chunkSize);
+            int index = GridmapUtilities.PosToIndex(pos, chunkSize);
 
             // Debug to prove that adding tiles works.
-            Debug.Log("Set the tile at position " + pos + " in chunk position " + position + " to the tile  " + tile);
+            //Debug.Log("Set the tile at position " + pos + " in chunk position " + position + " to the tile  " + tile);
             TilesInChunk[index] = tile;
+
+            tileNum += tile == null ? -1 : 1;
 
             ////If we have no loop connections, set some up
             //if (TilesInChunk[index].LoopConnections.Count == 0)
@@ -101,69 +112,11 @@ namespace Gridmap
         }
 
         /// <summary>
-        /// Gets the relative position of a certain grid position witin a given chunk.
-        /// </summary>
-        /// <param name="gridPos"></param>
-        /// <returns></returns>
-        internal static Vector3Int GetChunkRelativePos(Vector3Int pos, Vector3Int chunkSize)
-        {
-            //Wrap around to our tilemap, so we don't get out of range exceptions
-            //This might be a bad idea but we'll see
-            pos.x = GridmapUtilities.Mod(pos.x, chunkSize.x);
-            pos.y = GridmapUtilities.Mod(pos.y, chunkSize.y);
-            pos.z = GridmapUtilities.Mod(pos.z, chunkSize.z);
-            return pos;
-        }
-
-        /// <summary>
-        /// Gets the index of a certain position in a chunk given the chunk's size.
-        /// </summary>
-        /// <param name="pos">The position within the chunk.</param>
-        /// <param name="chunkSize">The size of teh chunk.</param>
-        /// <returns>The index of that cell in the chunk.</returns>
-        private static int GetTileIndex(Vector3Int pos, Vector3Int chunkSize)
-        {
-            //Wrap around to our tilemap, so we don't get out of range exceptions
-            //This might be a bad idea but we'll see
-            pos.x %= chunkSize.x;
-            pos.y %= chunkSize.y;
-            pos.z %= chunkSize.z;
-
-            int index = pos.x + (pos.y * chunkSize.x) + (pos.z * chunkSize.x * chunkSize.y);
-
-            return index;
-        }
-
-        private Vector3Int GetPositionFromIndex(int index)
-        {
-            Vector3Int offset = Vector3Int.zero;
-
-            offset.x = index % chunkSize.x;
-
-            index -= offset.x;
-            index /= chunkSize.x;
-
-            offset.y = index % chunkSize.y;
-
-            index -= offset.y;
-            index /= chunkSize.y;
-            offset.z = index;
-
-            return offset;
-        }
-
-        /// <summary>
         /// Makes baked updates to this chunk after it is modified.
         /// </summary>
         public void BakeChunk()
         {
             Mesh myMesh = BakeMesh();
-            if(myMesh == null)
-            {
-                gridmap.RemoveChunk(this);
-                DestroyImmediate(gameObject);
-                return;
-            }
             meshFilter.sharedMesh = BakeMesh();
         }
 
@@ -185,7 +138,8 @@ namespace Gridmap
                     continue;
                 }
 
-                Vector3 offset = gridmap.GridToCenteredPosition(GetPositionFromIndex(i)) + tilesInChunk[i].Offset;
+                Vector3 offset = gridmap.GridToCenteredPosition(GridmapUtilities.IndexToPos(i, chunkSize)) 
+                    + tilesInChunk[i].Offset;
                 Material[] materials = tilesInChunk[i].GetMaterials();
                 if (!instances.ContainsKey(materials[0]))
                 {
