@@ -77,7 +77,7 @@ namespace Gridmap
         /// <returns></returns>
         public GridTileBase GetTile(Vector3Int pos)
         {
-            int index = GridmapUtilities.GetIndexFromPosition(pos, chunkSize);
+            int index = GridmapUtilities.PosToIndex(pos, chunkSize);
             return TilesInChunk[index];
         }
 
@@ -88,7 +88,7 @@ namespace Gridmap
         /// <param name="pos">The position of the tile in gridmap space. (Not relative to the chunk)</param>
         public void SetTile(GridTileBase tile, Vector3Int pos)
         {
-            int index = GridmapUtilities.GetIndexFromPosition(pos, chunkSize);
+            int index = GridmapUtilities.PosToIndex(pos, chunkSize);
 
             // Debug to prove that adding tiles works.
             //Debug.Log("Set the tile at position " + pos + " in chunk position " + position + " to the tile  " + tile);
@@ -136,7 +136,7 @@ namespace Gridmap
                     continue;
                 }
 
-                Vector3 offset = gridmap.GridToCenteredPosition(GridmapUtilities.GetPositionFromIndex(i, chunkSize)) 
+                Vector3 offset = gridmap.GridToCenteredPosition(GridmapUtilities.IndexToPos(i, chunkSize)) 
                     + tilesInChunk[i].Offset;
                 Material[] materials = tilesInChunk[i].GetMaterials();
                 if (!instances.ContainsKey(materials[0]))

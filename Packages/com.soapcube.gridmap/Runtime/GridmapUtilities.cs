@@ -100,7 +100,7 @@ namespace Gridmap
         /// Gets the position of the chunk that contains a given grid position in chunk space.
         /// </summary>
         /// <param name="gridPos">The grid position to convert to get the chunk position of.</param>
-        public static Vector3Int ToChunkPos(Vector3Int gridPos, Vector3Int chunkSize)
+        public static Vector3Int GridToChunkPos(Vector3Int gridPos, Vector3Int chunkSize)
         {
             //Vector3Int chunkPosition = gridPos;
             ////Suprisingly, you can get the index of a Vector3
@@ -142,7 +142,7 @@ namespace Gridmap
         /// </summary>
         /// <param name="gridPos"></param>
         /// <returns></returns>
-        public static Vector3Int ToChunkRelativePos(Vector3Int gridPos, Vector3Int chunkSize)
+        public static Vector3Int GridToChunkRelativePos(Vector3Int gridPos, Vector3Int chunkSize)
         {
             //Wrap around to our tilemap, so we don't get out of range exceptions
             //This might be a bad idea but we'll see
@@ -161,7 +161,7 @@ namespace Gridmap
         /// <param name="chunkPos"></param>
         /// <param name="chunkSize"></param>
         /// <returns></returns>
-        public static Vector3Int ToGridPosFromChunk(Vector3Int relativePos, Vector3Int chunkPos, 
+        public static Vector3Int ChunkToGridPos(Vector3Int relativePos, Vector3Int chunkPos, 
             Vector3Int chunkSize)
         {
             Vector3Int chunkGridPos = Vector3Int.zero;
@@ -176,12 +176,13 @@ namespace Gridmap
 
         #region Position - Index
         /// <summary>
-        /// Gets the index of a certain position in a chunk given the chunk's size.
+        /// Gets the index of a certain position in a 3D cube given the cube's size.
         /// </summary>
-        /// <param name="pos">The position within the chunk.</param>
-        /// <param name="size">The size of teh chunk.</param>
-        /// <returns>The index of that cell in the chunk.</returns>
-        public static int GetIndexFromPosition(Vector3Int pos, Vector3Int size)
+        /// <remarks>Chunks are the primary form of "cube" used by this function.</remarks>
+        /// <param name="pos">The position within the cube.</param>
+        /// <param name="size">The size of the cube.</param>
+        /// <returns>The index of that cell in the cube.</returns>
+        public static int PosToIndex(Vector3Int pos, Vector3Int size)
         {
             //Wrap around to our tilemap, so we don't get out of range exceptions
             //This might be a bad idea but we'll see
@@ -189,6 +190,18 @@ namespace Gridmap
             pos.y %= size.y;
             pos.z %= size.z;
 
+            return PosToIndexUnlooped(pos, size);
+        }
+
+        /// <summary>
+        /// Gets the index of a certain position in a 3D cube given the cube's size.
+        /// </summary>
+        /// <remarks>Chunks are the primary form of "cube" used by this function.</remarks>
+        /// <param name="pos">The position within the cube.</param>
+        /// <param name="size">The size of the cube.</param>
+        /// <returns>The index of that cell in the cube.</returns>
+        public static int PosToIndexUnlooped(Vector3Int pos, Vector3Int size)
+        {
             int index = pos.x + (pos.y * size.x) + (pos.z * size.x * size.y);
 
             return index;
@@ -200,7 +213,7 @@ namespace Gridmap
         /// <param name="index">The array index of the position to find.</param>
         /// <param name="size">The size of the cube area that the array represents.</param>
         /// <returns>The position of the cell represented by the index.</returns>
-        public static Vector3Int GetPositionFromIndex(int index, Vector3Int size)
+        public static Vector3Int IndexToPos(int index, Vector3Int size)
         {
             Vector3Int offset = Vector3Int.zero;
 

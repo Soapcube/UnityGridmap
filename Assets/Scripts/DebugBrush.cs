@@ -26,9 +26,9 @@ namespace Gridmap.Brushes
 
             Vector3Int chunkSize = new(16, 16, 16);
             Debug.Log($"Grid Position: {swizzPos}.  World Space Position: {gridmap.GridToWorldPosition(swizzPos)}.  " +
-                $"Chunk Position: {GridmapUtilities.ToChunkPos(swizzPos, chunkSize)}.  Relative Position: " +
-                $"{GridmapUtilities.ToChunkRelativePos(swizzPos, chunkSize)}. Converted Grid Position: " +
-                $"{GridmapUtilities.ToGridPosFromChunk(GridmapUtilities.ToChunkRelativePos(swizzPos, chunkSize), GridmapUtilities.ToChunkPos(swizzPos, chunkSize), chunkSize)}");
+                $"Chunk Position: {GridmapUtilities.GridToChunkPos(swizzPos, chunkSize)}.  Relative Position: " +
+                $"{GridmapUtilities.GridToChunkRelativePos(swizzPos, chunkSize)}. Converted Grid Position: " +
+                $"{GridmapUtilities.ChunkToGridPos(GridmapUtilities.GridToChunkRelativePos(swizzPos, chunkSize), GridmapUtilities.GridToChunkPos(swizzPos, chunkSize), chunkSize)}");
         }
     }
 }
