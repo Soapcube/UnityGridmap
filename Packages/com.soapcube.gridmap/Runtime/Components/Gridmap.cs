@@ -61,7 +61,7 @@ namespace Gridmap
         /// <param name="point">The point in grid space where the tile is going</param>
         public void PlaceTileAtPoint(GridTileBase tile, Vector3Int point)
         {
-            Vector3Int chunkPosition = GridmapUtilities.GetChunkPos(point, chunkSize);
+            Vector3Int chunkPosition = GridmapUtilities.ToChunkPos(point, chunkSize);
 
             MeshChunk chunk = GetChunkByPosition(chunkPosition);
             //If the chunk is null, we'll simply make a new chunk and add it to the list
@@ -72,7 +72,7 @@ namespace Gridmap
             }
 
             //Add the tile to the chunk
-            chunk.SetTile(tile, GridmapUtilities.GetChunkRelativePos(point, chunkSize));
+            chunk.SetTile(tile, GridmapUtilities.ToChunkRelativePos(point, chunkSize));
         }
         /// <summary>
         /// Gets the tile at a given position.
@@ -81,7 +81,7 @@ namespace Gridmap
         /// <returns>The tile at that position.  Null if no tile.</returns>
         public GridTileBase GetTileAtPoint(Vector3Int pos)
         {
-            MeshChunk chunk = GetChunkByPosition(GridmapUtilities.GetChunkPos(pos, chunkSize));
+            MeshChunk chunk = GetChunkByPosition(GridmapUtilities.ToChunkPos(pos, chunkSize));
             if (chunk == null) { return null; }
             return chunk.GetTile(pos);
         }
@@ -190,7 +190,7 @@ namespace Gridmap
                 // ortientation.
                 Vector3Int swizzPos = GridmapUtilities.ConvertSwizzleSpace(pos, tilemap.layoutGrid.cellSwizzle);
 
-                Vector3Int chunkPosition = GridmapUtilities.GetChunkPos(swizzPos, chunkSize);
+                Vector3Int chunkPosition = GridmapUtilities.ToChunkPos(swizzPos, chunkSize);
                 if (!rebakedChunks.Contains(chunkPosition))
                 {
                     rebakedChunks.Add(chunkPosition);

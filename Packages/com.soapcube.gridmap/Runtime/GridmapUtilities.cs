@@ -94,12 +94,13 @@ namespace Gridmap
             return ((x % m) + m) % m;
         }
 
+        #region Position Conversions
         #region Chunk Positions
         /// <summary>
         /// Gets the position of the chunk that contains a given grid position in chunk space.
         /// </summary>
         /// <param name="gridPos">The grid position to convert to get the chunk position of.</param>
-        public static Vector3Int GetChunkPos(Vector3Int gridPos, Vector3Int chunkSize)
+        public static Vector3Int ToChunkPos(Vector3Int gridPos, Vector3Int chunkSize)
         {
             //Vector3Int chunkPosition = gridPos;
             ////Suprisingly, you can get the index of a Vector3
@@ -141,7 +142,7 @@ namespace Gridmap
         /// </summary>
         /// <param name="gridPos"></param>
         /// <returns></returns>
-        public static Vector3Int GetChunkRelativePos(Vector3Int gridPos, Vector3Int chunkSize)
+        public static Vector3Int ToChunkRelativePos(Vector3Int gridPos, Vector3Int chunkSize)
         {
             //Wrap around to our tilemap, so we don't get out of range exceptions
             //This might be a bad idea but we'll see
@@ -160,7 +161,7 @@ namespace Gridmap
         /// <param name="chunkPos"></param>
         /// <param name="chunkSize"></param>
         /// <returns></returns>
-        public static Vector3Int GetGridPositionFromChunk(Vector3Int relativePos, Vector3Int chunkPos, 
+        public static Vector3Int ToGridPosFromChunk(Vector3Int relativePos, Vector3Int chunkPos, 
             Vector3Int chunkSize)
         {
             Vector3Int chunkGridPos = Vector3Int.zero;
@@ -173,7 +174,7 @@ namespace Gridmap
         #endregion
 
 
-        #region Vector - Index
+        #region Position - Index
         /// <summary>
         /// Gets the index of a certain position in a chunk given the chunk's size.
         /// </summary>
@@ -216,6 +217,7 @@ namespace Gridmap
 
             return offset;
         }
+        #endregion
         #endregion
 
         #region Mesh Management
