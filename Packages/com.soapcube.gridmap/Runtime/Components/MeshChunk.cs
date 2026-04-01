@@ -29,6 +29,9 @@ namespace Gridmap
 
 
         [SerializeField, ShowIfNull] private Gridmap gridmap;
+
+        [SerializeField, ReadOnly] private int tileNum;
+
         private Mesh mesh;
 
         /// <summary>
@@ -70,6 +73,11 @@ namespace Gridmap
             mesh = new Mesh();
         }
 
+        internal bool IsEmpty()
+        {
+            return tileNum == 0;
+        }
+
         /// <summary>
         /// Gets the tile in this chunk position
         /// </summary>
@@ -94,6 +102,8 @@ namespace Gridmap
             //Debug.Log("Set the tile at position " + pos + " in chunk position " + position + " to the tile  " + tile);
             TilesInChunk[index] = tile;
 
+            tileNum += tile == null ? -1 : 1;
+
             ////If we have no loop connections, set some up
             //if (TilesInChunk[index].LoopConnections.Count == 0)
             //{
@@ -101,20 +111,12 @@ namespace Gridmap
             //}
         }
 
-
-
         /// <summary>
         /// Makes baked updates to this chunk after it is modified.
         /// </summary>
         public void BakeChunk()
         {
             Mesh myMesh = BakeMesh();
-            if(myMesh == null)
-            {
-                gridmap.RemoveChunk(this);
-                DestroyImmediate(gameObject);
-                return;
-            }
             meshFilter.sharedMesh = BakeMesh();
         }
 
