@@ -24,8 +24,11 @@ namespace Gridmap.Brushes
 
             Vector3Int swizzPos = GridmapUtilities.ConvertSwizzleSpace(position, gridLayout.cellSwizzle);
 
+            Vector3Int chunkSize = new(16, 16, 16);
             Debug.Log($"Grid Position: {swizzPos}.  World Space Position: {gridmap.GridToWorldPosition(swizzPos)}.  " +
-                $"Center Position: {gridmap.GridToCenteredPosition(swizzPos)}");
+                $"Chunk Position: {GridmapUtilities.GridToChunkPos(swizzPos, chunkSize)}.  Relative Position: " +
+                $"{GridmapUtilities.GridToChunkRelativePos(swizzPos, chunkSize)}. Converted Grid Position: " +
+                $"{GridmapUtilities.ChunkToGridPos(GridmapUtilities.GridToChunkRelativePos(swizzPos, chunkSize), GridmapUtilities.GridToChunkPos(swizzPos, chunkSize), chunkSize)}");
         }
     }
 }
