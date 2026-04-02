@@ -37,7 +37,6 @@ namespace Gridmap
         }
         #endregion
 
-
         #region Tile Management
         /// <summary>
         /// Places a tile at this point, generating a new chunk if there isn't one already
@@ -127,8 +126,6 @@ namespace Gridmap
         #endregion
 
         #region Position Conversions
-        // Need to double check these.
-
         /// <summary>
         /// Gets the world position of a given cell in the grid.
         /// </summary>
@@ -145,7 +142,7 @@ namespace Gridmap
         }
 
         /// <summary>
-        /// Gets the position at the center of the grid cell in grid space.
+        /// Gets the position at the center of the grid cell in local space.
         /// </summary>
         /// <remarks>
         /// Used for finding the position to center a certain tile's mesh at.
