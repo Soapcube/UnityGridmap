@@ -15,22 +15,15 @@ namespace Gridmap
     /// <summary>
     /// The chunks used in the Gridmap Class
     /// </summary>
-    internal class MeshChunk : MonoBehaviour
+    public class MeshChunk : MonoBehaviour
     {
-        [SerializeField, ReadOnly] private Vector3Int position;
-        [SerializeField, HideInInspector] private GridTileBase[] tilesInChunk;
-
-        /// <summary>
-        /// Size of the chunk
-        /// </summary>
-        [SerializeField, ReadOnly] private Vector3Int chunkSize;
-
         [SerializeField, ShowIfNull] private MeshFilter meshFilter;
-
-
         [SerializeField, ShowIfNull] private Gridmap gridmap;
-
+        [SerializeField, ReadOnly] private Vector3Int position;
+        [SerializeField, ReadOnly] private Vector3Int chunkSize;
         [SerializeField, ReadOnly] private int tileNum;
+
+        [SerializeField, HideInInspector] private GridTileBase[] tilesInChunk;
 
         private Mesh mesh;
 
@@ -38,26 +31,9 @@ namespace Gridmap
         /// Position of the Mesh Chunk
         /// </summary>
         public Vector3Int Position { get => position; set => position = value; }
-
-        /// <summary>
-        /// All the tiles within the chunk
-        /// </summary>
         public Mesh Mesh { get => mesh; }
+
         public GridTileBase[] TilesInChunk { get => tilesInChunk; set => tilesInChunk = value; }
-
-        /// <summary>
-        /// Create a new MeshChunk
-        /// </summary>
-        /// <param name="position">Position of the Chunk, also the position of index 0</param>
-        /// <param name="chunkSize">Size of the chunk, constant for all chunks. All values must be greater than 0</param>
-        //public MeshChunk(Vector3Int position, Vector3Int chunkSize)
-        //{
-        //    this.position = position;
-        //    //This doesn't matter but we always refer to X/Z/Y
-        //    tilesInChunk = new GridTileBase[chunkSize.x * chunkSize.y * chunkSize.z];
-
-        //    this.chunkSize = chunkSize;
-        //}
 
         internal void Initialize(Gridmap parentMap, Vector3Int position, Vector3Int chunkSize, MeshFilter mFilter)
         {
@@ -78,6 +54,7 @@ namespace Gridmap
             return tileNum == 0;
         }
 
+        #region Tiles
         /// <summary>
         /// Gets the tile in this chunk position
         /// </summary>
@@ -98,18 +75,21 @@ namespace Gridmap
         {
             int index = GridmapUtilities.PosToIndex(pos, chunkSize);
 
-            // Debug to prove that adding tiles works.
-            //Debug.Log("Set the tile at position " + pos + " in chunk position " + position + " to the tile  " + tile);
+            GridTileBase oldTile = TilesInChunk[index];
             TilesInChunk[index] = tile;
 
-            tileNum += tile == null ? -1 : 1;
-
-            ////If we have no loop connections, set some up
-            //if (TilesInChunk[index].LoopConnections.Count == 0)
-            //{
-            //    TilesInChunk[index].SetupLoopConnections();
-            //}
+            // If we're erasing a tile that exists, decrement tileNum
+            if (oldTile != null && tile == null)
+            {
+                tileNum--;
+            }
+            // If we're adding a new non-null tile, increment tileNum.
+            else if (oldTile == null && tile != null)
+            {
+                tileNum++;
+            }
         }
+        #endregion
 
         /// <summary>
         /// Makes baked updates to this chunk after it is modified.
