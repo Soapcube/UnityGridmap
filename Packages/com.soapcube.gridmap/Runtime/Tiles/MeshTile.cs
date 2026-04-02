@@ -1,6 +1,6 @@
 /*****************************************************************************
 // File Name : MeshTileTest.cs
-// Author : Brandon Koederitz
+// Author : Arcadia Koederitz
 // Creation Date : 12/23/2025
 // Last Modified : 12/23/2025
 //

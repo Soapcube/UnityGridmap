@@ -15,7 +15,7 @@ namespace Gridmap
     /// <summary>
     /// The chunks used in the Gridmap Class
     /// </summary>
-    internal class MeshChunk : MonoBehaviour
+    public class MeshChunk : MonoBehaviour
     {
         [SerializeField, ReadOnly] private Vector3Int position;
         [SerializeField, HideInInspector] private GridTileBase[] tilesInChunk;
@@ -98,17 +98,19 @@ namespace Gridmap
         {
             int index = GridmapUtilities.PosToIndex(pos, chunkSize);
 
-            // Debug to prove that adding tiles works.
-            //Debug.Log("Set the tile at position " + pos + " in chunk position " + position + " to the tile  " + tile);
+            GridTileBase oldTile = TilesInChunk[index];
             TilesInChunk[index] = tile;
 
-            tileNum += tile == null ? -1 : 1;
-
-            ////If we have no loop connections, set some up
-            //if (TilesInChunk[index].LoopConnections.Count == 0)
-            //{
-            //    TilesInChunk[index].SetupLoopConnections();
-            //}
+            // If we're erasing a tile that exists, decrement tileNum
+            if (oldTile != null && tile == null)
+            {
+                tileNum--;
+            }
+            // If we're adding a new non-null tile, increment tileNum.
+            else if (oldTile == null && tile != null)
+            {
+                tileNum++;
+            }
         }
 
         /// <summary>

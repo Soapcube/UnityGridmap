@@ -23,23 +23,7 @@ namespace Gridmap
         private static readonly Vector3Int chunkSize = new(16, 16, 16);
         #endregion
 
-        [SerializeField] private GridTileBase tile;
-        /// <summary>
-        /// The chunks in this map
-        /// </summary>
-        [SerializeField] private List<MeshChunk> chunks = new();
-        [SerializeField] private MeshChunk[] chunkArray;
-        [SerializeField] private BoundsInt chunkArrayBounds = new BoundsInt();
-
-        private void Start()
-        {
-            PlaceTileAtPoint(tile, Vector3Int.zero);
-            foreach (var chunk in chunks)
-            {
-                chunk.BakeMesh();
-                GetComponent<MeshFilter>().mesh = chunk.Mesh;
-            }
-        }
+        [SerializeField] private ChunkDictionary chunks;
 
         #region Component References
         [SerializeReference, ShowIfNull] private Tilemap tilemap;
@@ -62,39 +46,36 @@ namespace Gridmap
         /// <param name="point">The point in grid space where the tile is going</param>
         public void PlaceTileAtPoint(GridTileBase tile, Vector3Int point)
         {
-            Vector3Int chunkPosition = GridmapUtilities.GridToChunkPos(point, chunkSize);
+            Vector3Int chunkPos = GridmapUtilities.GridToChunkPos(point, chunkSize);
 
-            MeshChunk chunk = GetChunkByPosition(chunkPosition);
-            // Logic for erasing.
             if (tile == null)
             {
                 // If erasing in a null chunk, do nothing.
-                if (chunk != null)
+                if (chunks.ContainsKey(chunkPos))
                 {
-                    //Remove the tile from the chunk.
+                    MeshChunk chunk = chunks[chunkPos];
                     chunk.SetTile(tile, GridmapUtilities.GridToChunkRelativePos(point, chunkSize));
+
                     if (chunk.IsEmpty())
                     {
-                        // Delete the chunk.
+                        chunks.Remove(chunkPos);
                         DestroyImmediate(chunk.gameObject);
-                        RemoveChunk(chunk);
                     }
                 }
             }
             else
             {
                 //If the chunk is null, we'll simply make a new chunk and add it to the list
-                if (chunk == null)
+                if (!chunks.ContainsKey(chunkPos))
                 {
-                    //chunk = new(chunkPosition, chunkSize);
-                    chunk = CreateNewChunk(this, chunkPosition);
+                    CreateNewChunk(this, chunkPos);
                 }
 
-                //Add the tile to the chunk
+                MeshChunk chunk = chunks[chunkPos];
                 chunk.SetTile(tile, GridmapUtilities.GridToChunkRelativePos(point, chunkSize));
             }
-            
         }
+
         /// <summary>
         /// Gets the tile at a given position.
         /// </summary>
@@ -102,7 +83,7 @@ namespace Gridmap
         /// <returns>The tile at that position.  Null if no tile.</returns>
         public GridTileBase GetTileAtPoint(Vector3Int pos)
         {
-            MeshChunk chunk = GetChunkByPosition(GridmapUtilities.GridToChunkPos(pos, chunkSize));
+            MeshChunk chunk = chunks[GridmapUtilities.GridToChunkPos(pos, chunkSize)];
             if (chunk == null) { return null; }
             return chunk.GetTile(pos);
         }
@@ -125,40 +106,9 @@ namespace Gridmap
             MeshRenderer mRend = chunkGo.AddComponent<MeshRenderer>();
             chunk.Initialize(gridmap, chunkPosition, chunkSize, mFilter);
 
-            // Add the created chunk to the chunks array, performing resizing if needed.
-            //if (!chunkArrayBounds.Contains(chunkPosition))
-            //{
-            //    // Expand the chunk array's bounds to contain 1 extra layer.
-            //    chunkArrayBounds.SetMinMax(chunkArrayBounds.min - Vector3Int.one, chunkArrayBounds.max + Vector3Int.one);
-            //    MeshChunk[] newArray = new MeshChunk[chunkArrayBounds.x * chunkArrayBounds.y * chunkArrayBounds.z];
-            //    chunkArray.CopyTo(newArray, 0);
-            //}
-            //// Get the index of the chunk position relative to the min chunk position.
-            //int index = GetChunkIndex(chunkPosition, chunkArrayBounds);
-            //chunkArray[index] = chunk;
-            chunks.Add(chunk);
+            chunks.Add(chunkPosition, chunk);
 
             return chunk;
-        }
-
-        /// <summary>
-        /// Removes a chunk from the chunks array, resizing if needed.
-        /// </summary>
-        /// <param name="chunk"></param>
-        internal void RemoveChunk(MeshChunk chunk)
-        {
-            chunks.Remove(chunk);
-        }
-
-        /// <summary>
-        /// Gets the chunk at this position
-        /// </summary>
-        /// <param name="position">The position of the chunk</param>
-        /// <returns>The requested MeshChunk</returns>
-        private MeshChunk GetChunkByPosition(Vector3Int position)
-        {
-            //return chunkArray[GetChunkIndex(position, chunkArrayBounds)];
-            return chunks.Find(c => c.Position == position);
         }
 
         /// <summary>
@@ -166,7 +116,7 @@ namespace Gridmap
         /// </summary>
         public void BakeAllChunks()
         {
-            foreach (var chunk in chunks)
+            foreach (var chunk in chunks.Values)
             {
                 if (chunk != null)
                 {
@@ -174,35 +124,6 @@ namespace Gridmap
                 }
             }
         }
-
-        #region Chunk Array Management
-        private void ResizeChunkArray()
-        {
-
-        }
-
-        /// <summary>
-        /// Gets the layer of the chunkArray that this chunk exists in.
-        /// </summary>
-        /// <param name="chunkPos"></param>
-        /// <returns></returns>
-        private static int GetChunkLayer(Vector3Int chunkPos)
-        {
-            throw new NotImplementedException();
-        }
-        
-        /// <summary>
-        /// Gets the index of a chunk at a given chunk position.
-        /// </summary>
-        /// <param name="chunkPos">The chunk position to get the index of.</param>
-        /// <param name="bounds">The BoundsInt used to define the area where chunks are placed.</param>
-        /// <returns>The index of the chunk in the chunkArray.</returns>
-        private static int GetChunkIndex(Vector3Int chunkPos, BoundsInt bounds)
-        {
-            return GridmapUtilities.PosToIndex(chunkPos - bounds.min, bounds.size);
-        }
-        #endregion
-
         #endregion
 
         #region Position Conversions
@@ -245,7 +166,6 @@ namespace Gridmap
         }
         #endregion
 
-
         /// <summary>
         /// Bakes the tile mesh information 
         /// </summary>
@@ -254,7 +174,6 @@ namespace Gridmap
         public void BakeMesh(BoundsInt editedBounds)
         {
             List<Vector3Int> rebakedChunks = new List<Vector3Int>();
-            // Loop through all filled positions
             foreach (Vector3Int pos in editedBounds.allPositionsWithin)
             {
                 // The position is always in XYZ notation relative to the orientation of the grid.  Convert to the world
@@ -272,10 +191,9 @@ namespace Gridmap
 
             foreach(Vector3Int pos in rebakedChunks)
             {
-                MeshChunk toBake = GetChunkByPosition(pos);
-                if (toBake != null)
+                if (chunks.ContainsKey(pos))
                 {
-                    toBake.BakeChunk();
+                    chunks[pos].BakeChunk();
                 }
             }
         }
