@@ -29,11 +29,9 @@ namespace Gridmap
         /// </summary>
         [SerializeField, ReadOnly] private Vector3Int chunkSize;
 
-        [SerializeField, ShowIfNull] private MeshFilter meshFilter;
         [SerializeField, ShowIfNull] private MeshRenderer meshRenderer;
 
 
-        [SerializeField, ShowIfNull] private Gridmap gridmap;
         private Mesh mesh;
 
         /// <summary>
