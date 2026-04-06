@@ -10,10 +10,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 namespace Gridmap
 {
-    public abstract class GridTileBase : ScriptableObject
+    public abstract class GridTileBase : TileBase
     {
         [SerializeField] private Mesh mesh;
         

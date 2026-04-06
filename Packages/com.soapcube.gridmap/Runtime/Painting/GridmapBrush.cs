@@ -14,7 +14,7 @@ namespace Gridmap.Brushes
     [CustomGridBrush(false, true, false, "Gridmap Brush")]
     public class GridmapBrush : GridmapBrushBase
     {
-        [SerializeField] private GridTileBase testTile;
+        [SerializeField] private GridTileBase currentTile;
 
         #region Tools
         /// <summary>
@@ -105,7 +105,7 @@ namespace Gridmap.Brushes
         /// <returns>The selected MeshTile.</returns>
         private GridTileBase GetMeshTile()
         {
-            return testTile;
+            return currentTile;
         }
     }
 }
