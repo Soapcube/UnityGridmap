@@ -2,7 +2,7 @@
 // File Name : GridPaletteUtility.cs
 // Author : Arcadia Koederitz
 // Creation Date : 4/5/2025
-// Last Modified : 4/5/2025
+// Last Modified : 4/8/2025
 //
 // Brief Description : Editor script for managing GridPalettes
 *****************************************************************************/

@@ -12,8 +12,8 @@ namespace Gridmap
 {
     public interface IGridmapEditable
     {
-        void PlaceTileAtPoint(GridTileBase tile, Vector3Int point);
-        GridTileBase GetTileAtPoint(Vector3Int pos);
+        void PlaceTileAtPoint(GridTileBase tile, Vector3Int cellPos);
+        GridTileBase GetTileAtPoint(Vector3Int cellPos);
         void BakeMesh(BoundsInt editedBounds);
     }
 }

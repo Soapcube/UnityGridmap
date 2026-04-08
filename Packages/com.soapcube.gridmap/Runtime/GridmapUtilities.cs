@@ -6,6 +6,8 @@
 //
 // Brief Description : Set of static helper functions and core definitions for the Gridmap system.
 *****************************************************************************/
+using Codice.Client.Common;
+using NUnit.Framework.Constraints;
 using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 
@@ -227,5 +229,44 @@ namespace Gridmap
         }
         #endregion
         #endregion
+
+        /// <summary>
+        /// Converts an array of positions into a BoundsInt containing all positions.
+        /// </summary>
+        /// <param name="positions">The array of positions to get the bounds of.</param>
+        /// <returns>a BoundsInt representing the bounds containing all positions.</returns>
+        public static BoundsInt GetBoundsFromPositions(Vector3Int[] positions)
+        {
+            if (positions == null)
+            {
+                return new BoundsInt();
+                //throw new System.ArgumentNullException();
+            }
+            // Return empty bounds int for empty positions.
+            if (positions.Length == 0)
+            {
+                return new BoundsInt();
+            }
+            Vector3Int min = positions[0];
+            Vector3Int max = positions[0];
+            for(int i = 1; i < positions.Length; i++)
+            {
+                // Evaluate all components of the vector.
+                for(int j = 0; j < 3; j++)
+                {
+                    // Set a new min if the min is smaller.
+                    if (positions[i][j] < min[j])
+                    {
+                        min[j] = positions[i][j];
+                    }
+                    else if (positions[i][j] > max[j])
+                    {
+                        max[j] = positions[i][j];
+                    }
+                }
+            }
+            Vector3Int size = max - min;
+            return new BoundsInt(min.x, min.y, min.z, size.x, size.y, size.z);
+        }
     }
 }
