@@ -22,6 +22,9 @@ namespace Gridmap.Editor
         // Defaults
         private const string DEFAULT_LAYER_NAME = "Layer1";
         private const string DEFAULT_PALETTESO_NAME = "Palette Settings";
+
+        private const string ASSET_FOLDER = "Assets";
+        private const string MESH_FILE_EXTENSION = ".mesh";
         #endregion
 
         private static Texture2D prefabIcon = (EditorGUIUtility.IconContent("Prefab Icon").image as Texture2D);
@@ -54,14 +57,24 @@ namespace Gridmap.Editor
             GridLayout.CellLayout layout, Vector3 cellSize)
         {
             string name = Path.GetFileNameWithoutExtension(pathName);
-            // Create the GridPalette template GameObject.
-            GameObject tempGo = CreatePaletteGameObject(name, layout, cellSize);
 
+            // Create the mesh that renders the grid palette.
+            Mesh paletteMesh = new Mesh();
+            paletteMesh.MarkDynamic();
+            paletteMesh.name = name + " Mesh";
+
+            // Create the GridPalette prefab.
+            GameObject tempGo = CreatePaletteGameObject(name, layout, cellSize, paletteMesh);
             GameObject prefab = PrefabUtility.SaveAsPrefabAssetAndConnect(tempGo, pathName, 
                 InteractionMode.AutomatedAction);
-            // Creat the SO that configures palette settings.
+
+            // Create the SO that configures palette settings.
             GridPalette palette = CreatePaletteSettings();
+
+            // Add Sub-Assets.
             AssetDatabase.AddObjectToAsset(palette, prefab);
+            AssetDatabase.AddObjectToAsset(paletteMesh, prefab);
+
             PrefabUtility.ApplyPrefabInstance(tempGo, InteractionMode.AutomatedAction);
             AssetDatabase.Refresh();
 
@@ -76,8 +89,10 @@ namespace Gridmap.Editor
         /// <param name="name">The name of the palette GameObject.</param>
         /// <param name="layout">The layout of the cells.</param>
         /// <param name="cellSize">The size of celles in the palette.</param>
-        /// <returns></returns>
-        internal static GameObject CreatePaletteGameObject(string name, GridLayout.CellLayout layout, Vector3 cellSize)
+        /// <param name="paletteMesh">The mesh that stores rendering information about the grid palette.</param>
+        /// <returns>The created grid palette GameObject.</returns>
+        internal static GameObject CreatePaletteGameObject(string name, GridLayout.CellLayout layout, Vector3 cellSize, 
+            Mesh paletteMesh)
         {
             GameObject tempGo = new(name);
 
@@ -85,11 +100,11 @@ namespace Gridmap.Editor
             Grid grid = tempGo.AddComponent<Grid>();
             grid.cellSize = cellSize;
             grid.cellLayout = layout;
-            // Always use XYZ swizzle.
-            grid.cellSwizzle = GridLayout.CellSwizzle.XYZ;
-            Tilemap layer = CreatePaletteLayer(tempGo, DEFAULT_LAYER_NAME, layout);
+            grid.cellSwizzle = GridLayout.CellSwizzle.XYZ; // Always use XYZ swizzle.
+            Tilemap layer = CreatePaletteLayer(tempGo, DEFAULT_LAYER_NAME, layout, paletteMesh);
 
             // Configure GridMap specific components.
+
 
             return tempGo;
         }
@@ -97,11 +112,13 @@ namespace Gridmap.Editor
         /// <summary>
         /// Adds a new layer to a GridPalette.
         /// </summary>
-        /// <param name="palette"></param>
-        /// <param name="layerName"></param>
-        /// <param name="layout"></param>
-        /// <returns></returns>
-        private static Tilemap CreatePaletteLayer(GameObject palette, string layerName, GridLayout.CellLayout layout)
+        /// <param name="palette">The palette to add a layer to.</param>
+        /// <param name="layerName">The name of the layer.</param>
+        /// <param name="layout">The cell layout of the layer.</param>
+        /// <param name="paletteMesh">The mesh that the layer uses to render the GridPalette.</param>
+        /// <returns>The created tilemap component on the layer.</returns>
+        private static Tilemap CreatePaletteLayer(GameObject palette, string layerName, GridLayout.CellLayout layout, 
+            Mesh paletteMesh)
         {
             GameObject layerGo = new GameObject(layerName);
             Tilemap tilemap = layerGo.AddComponent<Tilemap>();
@@ -115,6 +132,11 @@ namespace Gridmap.Editor
                     tilemap.tileAnchor = Vector3.zero;
                     break;
             }
+
+            // Configure Gridmap Specific Components.
+            MeshFilter meshFilter = layerGo.AddComponent<MeshFilter>();
+            MeshRenderer meshRenderer = layerGo.AddComponent<MeshRenderer>();
+            meshFilter.sharedMesh = paletteMesh;
             
             return tilemap;
         }
@@ -135,5 +157,34 @@ namespace Gridmap.Editor
 
             return paletteSo;
         }
+
+        #region Mesh Management
+        /// <summary>
+        /// Creates a mesh asset in the project's assets folder to save the baked mesh data.
+        /// </summary>
+        /// <param name="gridmapName"> The name to use to identify the meshes associated with a given gridmap.</param>
+        /// <param name="targetChunk">The chunk that this mesh will belong to.</param>
+        /// <param name="createdMesh">The created mesh.</param>
+        /// <param name="meshPath">The path in the assets folder that the mesh was saved to.</param>
+        /// <param name="subdirectory">An optional subdirectory specifier for organization.</param>
+        internal static void CreateMeshAsset(string gridmapName, MeshChunk targetChunk,
+            out Mesh createdMesh, out string meshPath, string subdirectory = "Scenes/GridmapMeshes")
+        {
+            Mesh mesh = new Mesh();
+            mesh.MarkDynamic();
+
+            // Store the mesh files in a subfolder with the gridmap's name (just the scene name probably).
+            subdirectory = System.IO.Path.Join(subdirectory, gridmapName);
+            string filePath = System.IO.Path.Join(ASSET_FOLDER, subdirectory, gridmapName +
+                targetChunk.Position.ToString() + MESH_FILE_EXTENSION);
+
+            // Assign out variables.
+            meshPath = filePath;
+            createdMesh = mesh;
+
+            UnityEditor.AssetDatabase.CreateAsset(mesh, filePath);
+        }
+
+        #endregion
     }
 }

@@ -13,11 +13,6 @@ namespace Gridmap
 {
     public static class GridmapUtilities
     {
-        #region CONSTS
-        private const string ASSET_FOLDER = "Assets";
-        private const string MESH_FILE_EXTENSION = ".mesh";
-        #endregion
-
         /// <summary>
         /// Converts a Vector3 position to the correct axes specified by a grid swizzle.
         /// </summary>
@@ -231,37 +226,6 @@ namespace Gridmap
             return offset;
         }
         #endregion
-        #endregion
-
-        #region Mesh Management
-        /// <summary>
-        /// Creates a mesh asset in the project's assets folder to save the baked mesh data.
-        /// </summary>
-        /// <param name="gridmapName"> The name to use to identify the meshes associated with a given gridmap.</param>
-        /// <param name="targetChunk">The chunk that this mesh will belong to.</param>
-        /// <param name="createdMesh">The created mesh.</param>
-        /// <param name="meshPath">The path in the assets folder that the mesh was saved to.</param>
-        /// <param name="subdirectory">An optional subdirectory specifier for organization.</param>
-        //        internal static void CreateMeshAsset(string gridmapName, MeshChunk targetChunk,
-        //            out Mesh createdMesh, out string meshPath, string subdirectory = "Scenes/GridmapMeshes")
-        //        {
-        //            Mesh mesh = new Mesh();
-        //            mesh.MarkDynamic();
-
-        //            // Store the mesh files in a subfolder with the gridmap's name (just the scene name probably).
-        //            subdirectory = System.IO.Path.Join(subdirectory, gridmapName);
-        //            string filePath = System.IO.Path.Join(ASSET_FOLDER, subdirectory, gridmapName +
-        //                targetChunk.Position.ToString() + MESH_FILE_EXTENSION);
-
-        //            // Assign out variables.
-        //            meshPath = filePath;
-        //            createdMesh = mesh;
-
-        //#if UNITY_EDITOR
-        //            UnityEditor.AssetDatabase.CreateAsset(mesh, filePath);
-        //#endif
-        //        }
-
         #endregion
     }
 }

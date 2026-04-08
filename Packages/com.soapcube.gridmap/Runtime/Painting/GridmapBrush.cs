@@ -60,7 +60,7 @@ namespace Gridmap.Brushes
         {
             // Get tilemap reference.  Currently, I'm assuming it goes with the tilemap component.
             if (brushTarget == null) { return; }
-            if (!brushTarget.TryGetComponent(out Gridmap gridmap)) { return; }
+            if (!brushTarget.TryGetComponent(out IGridmapEditable gridmap)) { return; }
 
             // Loop through all filled positions
             foreach (Vector3Int pos in position.allPositionsWithin)
@@ -81,7 +81,7 @@ namespace Gridmap.Brushes
         {
             // Get tilemap reference.
             if (brushTarget == null) { return; }
-            if (!brushTarget.TryGetComponent(out Gridmap gridmap)) { return; }
+            if (!brushTarget.TryGetComponent(out IGridmapEditable gridmap)) { return; }
 
             // Loop through all filled positions
             foreach (Vector3Int pos in position.allPositionsWithin)
