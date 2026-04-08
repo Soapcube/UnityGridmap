@@ -37,7 +37,7 @@ namespace Gridmap.Brushes.Editor
                            && gameObject.activeInHierarchy
                            && !gameObject.hideFlags.HasFlag(HideFlags.NotEditable)
                            // Only get tilemaps that have a Gridmap component on them.
-                           && gameObject.TryGetComponent(out Gridmap gmap);
+                           && gameObject.TryGetComponent(out IGridmapEditable gmap);
                 }).Select(x => x.gameObject).ToArray();
             }
         }

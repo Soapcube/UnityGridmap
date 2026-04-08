@@ -13,7 +13,7 @@ using UnityEngine.Tilemaps;
 
 namespace Gridmap.Editor
 {
-    public static class GridPaletteUtility
+    public static class GridmapPaletteUtility
     {
         #region CONSTS
         private const string GRIDPALETTE_PATH = "GridPalette.prefab";
@@ -40,8 +40,8 @@ namespace Gridmap.Editor
         }
         #endregion
 
-        [MenuItem("Assets/Create/Gridmap/Grid Palette")]
-        public static void CreateGridPalette()
+        [MenuItem("Assets/Create/Gridmap/Gridmap Palette")]
+        public static void CreateGridmapPalette()
         {
             //ProjectWindowUtil.CreateScriptAssetFromTemplateFile(TEMPLATE_PATH, "GridPalette.prefab");
             ProjectWindowUtil.StartNameEditingIfProjectWindowExists(0, 
@@ -53,7 +53,7 @@ namespace Gridmap.Editor
         /// </summary>
         /// <param name="pathName">The path where the palette will be saved. (Automatically made unique)</param>
         /// <returns>The palette prefab created.</returns>
-        internal static UnityEngine.Object CreatePalettePrefab(string pathName, string templatePath, 
+        internal static Object CreatePalettePrefab(string pathName, string templatePath, 
             GridLayout.CellLayout layout, Vector3 cellSize)
         {
             string name = Path.GetFileNameWithoutExtension(pathName);
@@ -137,6 +137,9 @@ namespace Gridmap.Editor
             MeshFilter meshFilter = layerGo.AddComponent<MeshFilter>();
             MeshRenderer meshRenderer = layerGo.AddComponent<MeshRenderer>();
             meshFilter.sharedMesh = paletteMesh;
+
+            GridmapPalette gmp = layerGo.AddComponent<GridmapPalette>();
+            gmp.Initialize(meshFilter, tilemap);
             
             return tilemap;
         }
@@ -144,7 +147,7 @@ namespace Gridmap.Editor
         /// <summary>
         /// Creates the GridPalette ScriptableObject that holds the grid settings
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The GridPalette ScriptableObject that holds the palette's editor settings.</returns>
         internal static GridPalette CreatePaletteSettings()
         {
             GridPalette paletteSo = ScriptableObject.CreateInstance<GridPalette>();
@@ -167,23 +170,23 @@ namespace Gridmap.Editor
         /// <param name="createdMesh">The created mesh.</param>
         /// <param name="meshPath">The path in the assets folder that the mesh was saved to.</param>
         /// <param name="subdirectory">An optional subdirectory specifier for organization.</param>
-        internal static void CreateMeshAsset(string gridmapName, MeshChunk targetChunk,
-            out Mesh createdMesh, out string meshPath, string subdirectory = "Scenes/GridmapMeshes")
-        {
-            Mesh mesh = new Mesh();
-            mesh.MarkDynamic();
+        //internal static void CreateMeshAsset(string gridmapName, MeshChunk targetChunk,
+        //    out Mesh createdMesh, out string meshPath, string subdirectory = "Scenes/GridmapMeshes")
+        //{
+        //    Mesh mesh = new Mesh();
+        //    mesh.MarkDynamic();
 
-            // Store the mesh files in a subfolder with the gridmap's name (just the scene name probably).
-            subdirectory = System.IO.Path.Join(subdirectory, gridmapName);
-            string filePath = System.IO.Path.Join(ASSET_FOLDER, subdirectory, gridmapName +
-                targetChunk.Position.ToString() + MESH_FILE_EXTENSION);
+        //    // Store the mesh files in a subfolder with the gridmap's name (just the scene name probably).
+        //    subdirectory = System.IO.Path.Join(subdirectory, gridmapName);
+        //    string filePath = System.IO.Path.Join(ASSET_FOLDER, subdirectory, gridmapName +
+        //        targetChunk.Position.ToString() + MESH_FILE_EXTENSION);
 
-            // Assign out variables.
-            meshPath = filePath;
-            createdMesh = mesh;
+        //    // Assign out variables.
+        //    meshPath = filePath;
+        //    createdMesh = mesh;
 
-            UnityEditor.AssetDatabase.CreateAsset(mesh, filePath);
-        }
+        //    UnityEditor.AssetDatabase.CreateAsset(mesh, filePath);
+        //}
 
         #endregion
     }

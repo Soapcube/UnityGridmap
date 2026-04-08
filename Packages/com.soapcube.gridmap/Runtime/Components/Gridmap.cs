@@ -13,7 +13,6 @@ using UnityEngine.Tilemaps;
 
 namespace Gridmap
 {
-    [RequireComponent(typeof(Tilemap))]
     public class Gridmap : MonoBehaviour, IGridmapEditable
     {
         #region CONSTS
