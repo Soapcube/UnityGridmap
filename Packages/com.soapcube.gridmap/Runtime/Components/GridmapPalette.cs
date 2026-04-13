@@ -5,7 +5,9 @@
 // Last Modified : 4/8/2025
 //
 // Brief Description : Manages GridPalette prefabs and exposes functions for setting and getting specific tiles.
+Utilizes the tilemap's built-in functionality,as tile palettes are only 2D.
 *****************************************************************************/
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -33,7 +35,7 @@ namespace Gridmap
         /// <returns>The tile at that position.</returns>
         public GridTileBase GetTileAtPoint(Vector3Int pos)
         {
-            throw new System.NotImplementedException();
+            return tilemap.GetTile(pos) as GridTileBase;
         }
 
         /// <summary>
@@ -45,16 +47,26 @@ namespace Gridmap
         {
             Debug.Log($"Grid tile {tile} was added to GridmapPalette {name} at " +
                 $"position {cellPos}");
+            tilemap.SetTile(cellPos, tile);
         }
 
         /// <summary>
         /// Bakes the mesh that renders this TilePalette.
         /// </summary>
-        /// <param name="editedBounds">The bounds of the changed tiles.</param>
+        /// <param name="editedBounds">The bounds of the changed tiles.  Unused.</param>
         public void BakeMesh(BoundsInt editedBounds)
         {
+            tilemap.CompressBounds();
+            GridTileBase[] gridTiles = tilemap.GetTilesBlock(tilemap.cellBounds).Select(x => x as GridTileBase).ToArray();
             // GridmapPalette will only have 1 mesh, so it just rebakes the mesh.
-            throw new System.NotImplementedException();
+            for (int i = 0; i < gridTiles.Length; i++)
+            {
+                if (gridTiles[i] == null) { continue; }
+                Vector3Int cellPos = GridmapUtilities.IndexToPos(i, tilemap.cellBounds.size) + 
+                    tilemap.cellBounds.position;
+                // Bake the mesh here.
+                Debug.Log($"Tile: {gridTiles[i]}.  Index: {i}. Position: {cellPos}");
+            }
         }
     }
 }

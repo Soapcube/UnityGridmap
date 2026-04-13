@@ -33,13 +33,13 @@ namespace Gridmap.Editor
         {
             if (tilemap.TryGetComponent(out GridmapPalette gridmapPalette))
             {
-                foreach(Tilemap.SyncTile tileSync in tileChanges)
-                {
-                    if (tileSync.tile is GridTileBase gridTile)
-                    {
-                        gridmapPalette.PlaceTileAtPoint(gridTile, tileSync.position);
-                    }
-                }
+                //foreach(Tilemap.SyncTile tileSync in tileChanges)
+                //{
+                //    if (tileSync.tile is GridTileBase gridTile)
+                //    {
+                //        gridmapPalette.PlaceTileAtPoint(gridTile, tileSync.position);
+                //    }
+                //}
                 BoundsInt editedBounds = 
                     GridmapUtilities.GetBoundsFromPositions(tileChanges.Select(x => x.position).ToArray());
                 gridmapPalette.BakeMesh(editedBounds);
