@@ -6,6 +6,8 @@
 //
 // Brief Description : Set of static helper functions and core definitions for the Gridmap system.
 *****************************************************************************/
+using Codice.Client.Common;
+using NUnit.Framework.Constraints;
 using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 
@@ -13,11 +15,6 @@ namespace Gridmap
 {
     public static class GridmapUtilities
     {
-        #region CONSTS
-        private const string ASSET_FOLDER = "Assets";
-        private const string MESH_FILE_EXTENSION = ".mesh";
-        #endregion
-
         /// <summary>
         /// Converts a Vector3 position to the correct axes specified by a grid swizzle.
         /// </summary>
@@ -233,35 +230,43 @@ namespace Gridmap
         #endregion
         #endregion
 
-        #region Mesh Management
         /// <summary>
-        /// Creates a mesh asset in the project's assets folder to save the baked mesh data.
+        /// Converts an array of positions into a BoundsInt containing all positions.
         /// </summary>
-        /// <param name="gridmapName"> The name to use to identify the meshes associated with a given gridmap.</param>
-        /// <param name="targetChunk">The chunk that this mesh will belong to.</param>
-        /// <param name="createdMesh">The created mesh.</param>
-        /// <param name="meshPath">The path in the assets folder that the mesh was saved to.</param>
-        /// <param name="subdirectory">An optional subdirectory specifier for organization.</param>
-        //        internal static void CreateMeshAsset(string gridmapName, MeshChunk targetChunk,
-        //            out Mesh createdMesh, out string meshPath, string subdirectory = "Scenes/GridmapMeshes")
-        //        {
-        //            Mesh mesh = new Mesh();
-        //            mesh.MarkDynamic();
-
-        //            // Store the mesh files in a subfolder with the gridmap's name (just the scene name probably).
-        //            subdirectory = System.IO.Path.Join(subdirectory, gridmapName);
-        //            string filePath = System.IO.Path.Join(ASSET_FOLDER, subdirectory, gridmapName +
-        //                targetChunk.Position.ToString() + MESH_FILE_EXTENSION);
-
-        //            // Assign out variables.
-        //            meshPath = filePath;
-        //            createdMesh = mesh;
-
-        //#if UNITY_EDITOR
-        //            UnityEditor.AssetDatabase.CreateAsset(mesh, filePath);
-        //#endif
-        //        }
-
-        #endregion
+        /// <param name="positions">The array of positions to get the bounds of.</param>
+        /// <returns>a BoundsInt representing the bounds containing all positions.</returns>
+        public static BoundsInt GetBoundsFromPositions(Vector3Int[] positions)
+        {
+            if (positions == null)
+            {
+                return new BoundsInt();
+                //throw new System.ArgumentNullException();
+            }
+            // Return empty bounds int for empty positions.
+            if (positions.Length == 0)
+            {
+                return new BoundsInt();
+            }
+            Vector3Int min = positions[0];
+            Vector3Int max = positions[0];
+            for(int i = 1; i < positions.Length; i++)
+            {
+                // Evaluate all components of the vector.
+                for(int j = 0; j < 3; j++)
+                {
+                    // Set a new min if the min is smaller.
+                    if (positions[i][j] < min[j])
+                    {
+                        min[j] = positions[i][j];
+                    }
+                    else if (positions[i][j] > max[j])
+                    {
+                        max[j] = positions[i][j];
+                    }
+                }
+            }
+            Vector3Int size = max - min;
+            return new BoundsInt(min.x, min.y, min.z, size.x, size.y, size.z);
+        }
     }
 }

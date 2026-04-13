@@ -13,8 +13,7 @@ using UnityEngine.Tilemaps;
 
 namespace Gridmap
 {
-    [RequireComponent(typeof(Tilemap))]
-    public class Gridmap : MonoBehaviour
+    public class Gridmap : MonoBehaviour, IGridmapEditable
     {
         #region CONSTS
         /// <summary>
@@ -84,7 +83,7 @@ namespace Gridmap
         {
             MeshChunk chunk = chunks[GridmapUtilities.GridToChunkPos(pos, chunkSize)];
             if (chunk == null) { return null; }
-            return chunk.GetTile(pos);
+            return chunk.GetTile(GridmapUtilities.GridToChunkRelativePos(pos, chunkSize));
         }
         #endregion
 
