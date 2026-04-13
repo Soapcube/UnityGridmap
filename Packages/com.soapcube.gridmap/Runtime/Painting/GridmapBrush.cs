@@ -97,6 +97,35 @@ namespace Gridmap.Brushes
             gridmap.BakeMesh(position);
         }
 
+        /// <summary>
+        /// Picks a tile from a selected gridmap, given tile coordiantes.
+        /// </summary>
+        /// <param name="gridLayout">Grid to pick data from.</param>
+        /// <param name="brushTarget">The gameobject that was picked from.</param>
+        /// <param name="position">The position of the picked cell.</param>
+        /// <param name="pivot">The pivot of the picking brush,</param>
+        public override void Pick(GridLayout gridLayout, GameObject brushTarget, BoundsInt position, Vector3Int pivot)
+        {
+            if (brushTarget == null) { return; }
+            if (!brushTarget.TryGetComponent(out IGridmapEditable gridmap)) { return; }
+
+            foreach(Vector3Int pos in position.allPositionsWithin)
+            {
+                Vector3Int swizzPos = GridmapUtilities.ConvertSwizzleSpace(pos, gridLayout.cellSwizzle);
+                // Add support for multiple cell picking in the future.
+                PickCell(gridmap, swizzPos);
+            }
+        }
+
+        /// <summary>
+        /// Picks a cell on the GridMap and sets this brush's selected tile.
+        /// </summary>
+        /// <param name="gridmap">The gridmap to pick from.</param>
+        /// <param name="pos">The position on the gridmap to pick.</param>
+        private void PickCell(IGridmapEditable gridmap, Vector3Int pos)
+        {
+            currentTile = gridmap.GetTileAtPoint(pos);
+        }
         #endregion
 
         /// <summary>

@@ -83,7 +83,7 @@ namespace Gridmap
         {
             MeshChunk chunk = chunks[GridmapUtilities.GridToChunkPos(pos, chunkSize)];
             if (chunk == null) { return null; }
-            return chunk.GetTile(pos);
+            return chunk.GetTile(GridmapUtilities.GridToChunkRelativePos(pos, chunkSize));
         }
         #endregion
 
