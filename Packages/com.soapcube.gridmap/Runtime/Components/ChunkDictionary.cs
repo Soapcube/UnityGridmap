@@ -42,6 +42,12 @@ namespace Gridmap
         public void OnAfterDeserialize()
         {
             this.Clear();
+
+            if (keys ==null || values ==null)
+            {
+                Debug.LogWarning("A serialized ChunkDictionary had a null keys or values array.");
+                return;
+            }
             // Error checking here.
             if (keys.Length != values.Length)
             {
