@@ -32,7 +32,7 @@ namespace Gridmap
         [ContextMenu("Get Component References")]
         private void Reset()
         {
-            tilemap = GetComponent<Tilemap>();
+            tilemap = GetComponentInChildren<Tilemap>();
         }
         #endregion
 
