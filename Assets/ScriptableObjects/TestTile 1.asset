@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: TestTile 1
   m_EditorClassIdentifier: soapcube.gridmap::Gridmap.MeshTileTest
   mesh: {fileID: 0}
-  testMesh: {fileID: -2432090755550338912, guid: c3f755e2a5d7b924484512308476504a, type: 3}
-  offset: {x: 0, y: -1, z: 0}
+  testMesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+  offset: {x: 0, y: -0.5, z: 0}
   materials:
-  - {fileID: 2100000, guid: 761d8e1f988ed2345a28312145c79c6e, type: 2}
+  - {fileID: 2100000, guid: c2e40fa84d53ccd428f640eac126b1fb, type: 2}

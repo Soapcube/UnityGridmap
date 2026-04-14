@@ -16,7 +16,6 @@ namespace Gridmap
     [Serializable]
     public class ChunkDictionary : Dictionary<Vector3Int, MeshChunk>, ISerializationCallbackReceiver
     {
-        [SerializeField] private float test;
         [SerializeField] private Vector3Int[] keys;
         [SerializeField] private MeshChunk[] values;
 
