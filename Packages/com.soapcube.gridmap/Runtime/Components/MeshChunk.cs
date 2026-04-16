@@ -143,10 +143,16 @@ namespace Gridmap
                 Vector3 offset = gridmap.GridToCenteredPosition(GridmapUtilities.IndexToPos(i, chunkSize)) 
                     + tilesInChunk[i].Offset;
                 Material[] materials = tilesInChunk[i].GetMaterials();
-                if (!instances.ContainsKey(materials[0]))
+                foreach (Material material in materials)
                 {
-                    instances.Add(materials[0], new());
+                    if (instances.ContainsKey(material)) continue;
+
+                    instances.Add(material, new List<CombineInstance>());
                 }
+                //if (!instances.ContainsKey(materials[0]))
+                //{
+                //    instances.Add(materials[0], new());
+                //}
 
                 //So much math...This feels inefficient. I'll have to find a better way
                 //I found a better way
@@ -156,13 +162,31 @@ namespace Gridmap
                 //    offsetVertices[j] = tileMesh.vertices[j] + offset;
                 //}
                 //tileMesh.vertices = offsetVertices;
-                CombineInstance newInstance = new()
+                if (tileMesh.subMeshCount == 1)
                 {
-                    mesh = tileMesh,
-                    transform = Matrix4x4.Translate(offset),
-                };
+                    CombineInstance newInstance = new()
+                    {
+                        mesh = tileMesh,
+                        transform = Matrix4x4.Translate(offset),
+                    };
 
-                instances[materials[0]].Add(newInstance);
+                    instances[materials[0]].Add(newInstance);
+                }
+                else
+                {
+                    for(int j = 0; j < tileMesh.subMeshCount; j++)
+                    {
+                        Mesh submesh = MeshHelper.SubmeshToMesh(tileMesh.GetSubMesh(j), tileMesh.vertices, tileMesh.triangles);
+                        CombineInstance newInstance = new()
+                        {
+                            mesh = submesh,
+                            transform = Matrix4x4.Translate(offset),
+                        };
+
+                        instances[materials[j]].Add(newInstance);
+                    }
+                }
+
             }
             if(instances.Count == 0)
             {

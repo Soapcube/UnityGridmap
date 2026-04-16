@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: soapcube.gridmap::Gridmap.Brushes.GridmapBrush
   autoUpdateElevation: 0
   brushElevation: 0
-  currentTile: {fileID: 11400000, guid: 81257f47f58734e4791fa41f2acad79b, type: 2}
+  currentTile: {fileID: 11400000, guid: f1f2ebc2507f0ba45a198c413ca208ee, type: 2}

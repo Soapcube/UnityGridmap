@@ -8,6 +8,7 @@
 *****************************************************************************/
 
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -20,7 +21,7 @@ namespace Gridmap
     {
         public static Mesh SubmeshToMesh(SubMeshDescriptor submesh, Vector3[] vertices, int[] triangles)
         {
-            Mesh mesh = new Mesh();
+            Mesh mesh = new();
             int firstVertexIndex = submesh.firstVertex;
 
             List<int> allVerticesIndex = new();
@@ -29,13 +30,25 @@ namespace Gridmap
                 allVerticesIndex.Add(i + firstVertexIndex);
             }
             string debugText = "";
-            foreach (int vertexIndex in allVerticesIndex)
+            List<int> newTriangles = new();
+            foreach (int vertexIndex in triangles)
             {
-                debugText += vertexIndex.ToString() + " ";
+                if (allVerticesIndex.Contains(vertexIndex))
+                {
+                    newTriangles.Add(vertexIndex - firstVertexIndex);
+                    debugText += vertexIndex.ToString() + " ";
+                }
             }
             Debug.Log(debugText);
-            
-            return new Mesh();
+            Vector3[] newVertices = vertices[firstVertexIndex..(firstVertexIndex + submesh.vertexCount)];
+
+            mesh.vertices = newVertices;
+            mesh.triangles = newTriangles.ToArray();
+
+            mesh.RecalculateBounds();
+            mesh.RecalculateNormals();
+
+            return mesh;
         }
     }
 }
