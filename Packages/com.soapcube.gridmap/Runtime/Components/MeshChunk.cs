@@ -20,10 +20,17 @@ namespace Gridmap
         [SerializeField, ShowIfNull] private MeshFilter meshFilter;
         [SerializeField, ShowIfNull] private Gridmap gridmap;
         [SerializeField, ReadOnly] private Vector3Int position;
-        [SerializeField, ReadOnly] private Vector3Int chunkSize;
         [SerializeField, ReadOnly] private int tileNum;
 
         [SerializeField, HideInInspector] private GridTileBase[] tilesInChunk;
+
+        /// <summary>
+        /// Size of the chunk
+        /// </summary>
+        [SerializeField, ReadOnly] private Vector3Int chunkSize;
+
+        [SerializeField, ShowIfNull] private MeshRenderer meshRenderer;
+
 
         private Mesh mesh;
 
@@ -35,11 +42,26 @@ namespace Gridmap
 
         public GridTileBase[] TilesInChunk { get => tilesInChunk; set => tilesInChunk = value; }
 
-        internal void Initialize(Gridmap parentMap, Vector3Int position, Vector3Int chunkSize, MeshFilter mFilter)
+        /// <summary>
+        /// Create a new MeshChunk
+        /// </summary>
+        /// <param name="position">Position of the Chunk, also the position of index 0</param>
+        /// <param name="chunkSize">Size of the chunk, constant for all chunks. All values must be greater than 0</param>
+        //public MeshChunk(Vector3Int position, Vector3Int chunkSize)
+        //{
+        //    this.position = position;
+        //    //This doesn't matter but we always refer to X/Z/Y
+        //    tilesInChunk = new GridTileBase[chunkSize.x * chunkSize.y * chunkSize.z];
+
+        //    this.chunkSize = chunkSize;
+        //}
+
+        internal void Initialize(Gridmap parentMap, Vector3Int position, Vector3Int chunkSize, MeshFilter mFilter, MeshRenderer mRend)
         {
             gameObject.hideFlags = HideFlags.NotEditable;
             this.gridmap = parentMap;
             this.meshFilter = mFilter;
+            this.meshRenderer = mRend;
             this.position = position;
             transform.localPosition = GridmapUtilities.GetChunkLocalPosition(position, chunkSize);
             //This doesn't matter but we always refer to X/Z/Y
@@ -121,10 +143,16 @@ namespace Gridmap
                 Vector3 offset = gridmap.GridToCenteredPosition(GridmapUtilities.IndexToPos(i, chunkSize)) 
                     + tilesInChunk[i].Offset;
                 Material[] materials = tilesInChunk[i].GetMaterials();
-                if (!instances.ContainsKey(materials[0]))
+                foreach (Material material in materials)
                 {
-                    instances.Add(materials[0], new());
+                    if (instances.ContainsKey(material)) continue;
+
+                    instances.Add(material, new List<CombineInstance>());
                 }
+                //if (!instances.ContainsKey(materials[0]))
+                //{
+                //    instances.Add(materials[0], new());
+                //}
 
                 //So much math...This feels inefficient. I'll have to find a better way
                 //I found a better way
@@ -134,36 +162,54 @@ namespace Gridmap
                 //    offsetVertices[j] = tileMesh.vertices[j] + offset;
                 //}
                 //tileMesh.vertices = offsetVertices;
-                CombineInstance newInstance = new()
+                if (tileMesh.subMeshCount == 1)
                 {
-                    mesh = tileMesh,
-                    transform = Matrix4x4.Translate(offset),
-                };
+                    CombineInstance newInstance = new()
+                    {
+                        mesh = tileMesh,
+                        transform = Matrix4x4.Translate(offset),
+                    };
 
-                instances[materials[0]].Add(newInstance);
+                    instances[materials[0]].Add(newInstance);
+                }
+                else
+                {
+                    for(int j = 0; j < tileMesh.subMeshCount; j++)
+                    {
+                        Mesh submesh = MeshHelper.SubmeshToMesh(tileMesh.GetSubMesh(j), tileMesh.vertices, tileMesh.triangles);
+                        CombineInstance newInstance = new()
+                        {
+                            mesh = submesh,
+                            transform = Matrix4x4.Translate(offset),
+                        };
+
+                        instances[materials[j]].Add(newInstance);
+                    }
+                }
+
             }
             if(instances.Count == 0)
             {
                 return null;
             }
-            List<CombineInstance> finalInstance = new List<CombineInstance>();
+            List<CombineInstance> finalInstance = new();
             foreach (List<CombineInstance> instance in instances.Values)
             {
                 Mesh newInstance = new();
                 newInstance.CombineMeshes(instance.ToArray(), true);
-                Debug.Log(newInstance);
 
                 CombineInstance nextInstance = new()
                 {
                     mesh = newInstance,
-                    transform = new()
+                    transform = Matrix4x4.identity,
                 };
                 finalInstance.Add(nextInstance);
             }
-            masterMesh = finalInstance[0].mesh;
+            //masterMesh = finalInstance[0].mesh;
             //masterMesh.CombineMeshes(instances[instances.Keys.First()].ToArray(), true, true);
-            //masterMesh.CombineMeshes(finalInstance.ToArray(), true);
+            masterMesh.CombineMeshes(finalInstance.ToArray(), false);
             mesh = masterMesh;
+            meshRenderer.SetMaterials(instances.Keys.ToList());
 
             return masterMesh;
         }
