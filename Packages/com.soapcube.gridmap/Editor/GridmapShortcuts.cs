@@ -6,22 +6,34 @@
 //
 // Brief Description : Handles all gridmap editor shortcuts.
 *****************************************************************************/
+using Gridmap.Brushes;
 using UnityEditor.ShortcutManagement;
+using UnityEditor.Tilemaps;
 using UnityEngine;
 
 namespace Gridmap.Editor
 {
     public static class GridmapShortcuts
     {
-        [Shortcut("Gridmap/Gridmap Painter Up")]
+        [Shortcut("Gridmap/Gridmap Painter Up", typeof(TilemapEditorTool.ShortcutContext), null, KeyCode.Equals, ShortcutModifiers.None)]
         public static void GridmapPainterUp()
         {
-
+            GridmapBrushBase brush = GridPaintingState.gridBrush as GridmapBrushBase;
+            if (brush != null)
+            {
+                brush.BrushElevation++;
+            }
+            
         }
 
+        [Shortcut("Gridmap/Gridmap Painter Down", typeof(TilemapEditorTool.ShortcutContext), null, KeyCode.Minus, ShortcutModifiers.None)]
         public static void GridmapPainterDown()
         {
-
+            GridmapBrushBase brush = GridPaintingState.gridBrush as GridmapBrushBase;
+            if (brush != null)
+            {
+                brush.BrushElevation--;
+            }
         }
     }
 }

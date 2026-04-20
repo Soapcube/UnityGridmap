@@ -29,7 +29,11 @@ namespace Gridmap.Brushes
 
         #region Properties
         public bool AutoUpdateElevation => autoUpdateElevation;
-        public int BrushElevation => brushElevation;
+        public int BrushElevation
+        {
+            get {  return brushElevation; }
+            set { brushElevation = value; }
+        }
         #endregion
     }
 }
