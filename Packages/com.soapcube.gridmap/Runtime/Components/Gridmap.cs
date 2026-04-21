@@ -26,15 +26,14 @@ namespace Gridmap
 
         #region Component References
         [SerializeReference, ShowIfNull] private Tilemap tilemap;
-        /// <summary>
-        /// Get Component references automatically on component reset.
-        /// </summary>
-        [ContextMenu("Get Component References")]
-        private void Reset()
-        {
-            tilemap = GetComponentInChildren<Tilemap>();
-        }
         #endregion
+
+        public void OnCreate(Tilemap tmap)
+        {
+#if UNITY_EDITOR
+            this.tilemap = tmap;
+#endif
+        }
 
         #region Tile Management
         /// <summary>

@@ -43,7 +43,7 @@ namespace Gridmap.Editor
         [MenuItem("Assets/Create/Gridmap/Gridmap Palette")]
         public static void CreateGridmapPalette()
         {
-            //ProjectWindowUtil.CreateScriptAssetFromTemplateFile(TEMPLATE_PATH, "GridPalette.prefab");
+            //Utilized built-in project window utilities to create the GridPalette object.
             ProjectWindowUtil.StartNameEditingIfProjectWindowExists(0, 
                 ScriptableObject.CreateInstance<DoCreateRectangularPaletteFile>(), GRIDPALETTE_PATH, prefabIcon, TEMPLATE_PATH);
         }

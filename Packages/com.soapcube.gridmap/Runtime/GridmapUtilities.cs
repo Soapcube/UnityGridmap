@@ -15,6 +15,10 @@ namespace Gridmap
 {
     public static class GridmapUtilities
     {
+        #region CONSTS
+        public const HideFlags GRIDMAP_SUB_HIDEFLAGS = HideFlags.NotEditable;
+        #endregion
+
         /// <summary>
         /// Converts a Vector3 position to the correct axes specified by a grid swizzle.
         /// </summary>
