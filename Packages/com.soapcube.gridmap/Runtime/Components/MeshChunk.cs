@@ -58,7 +58,7 @@ namespace Gridmap
 
         internal void Initialize(Gridmap parentMap, Vector3Int position, Vector3Int chunkSize, MeshFilter mFilter, MeshRenderer mRend)
         {
-            gameObject.hideFlags = HideFlags.NotEditable;
+            gameObject.hideFlags = GridmapUtilities.GRIDMAP_SUB_HIDEFLAGS;
             this.gridmap = parentMap;
             this.meshFilter = mFilter;
             this.meshRenderer = mRend;

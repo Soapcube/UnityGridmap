@@ -27,7 +27,7 @@ namespace Gridmap.Brushes
         public override void Paint(GridLayout gridLayout, GameObject brushTarget, Vector3Int position)
         {
             // Offset position based on the brushElevation since it isn't applied automatically.
-            position.z += brushElevation;
+            position.z += gridZ;
             // Reuse the BoxFill function to paint a singular tile.
             BoundsInt bounds = new BoundsInt(position, DEFAULT_CELL_SIZE);
             BoxFill(gridLayout, brushTarget, bounds);
@@ -43,7 +43,7 @@ namespace Gridmap.Brushes
         public override void Erase(GridLayout gridLayout, GameObject brushTarget, Vector3Int position)
         {
             // Offset position based on the brushElevation since it isn't applied automatically.
-            position.z += brushElevation;
+            position.z += gridZ;
             // Reuse the BoxErase function to erase a singular tile.
             BoundsInt bounds = new BoundsInt(position, DEFAULT_CELL_SIZE);
             BoxErase(gridLayout, brushTarget, bounds);

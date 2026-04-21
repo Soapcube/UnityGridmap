@@ -12,7 +12,14 @@ namespace Gridmap
 {
     public class GridmapPainter : MonoBehaviour, IGridmapEditable
     {
-        [SerializeField] private Gridmap gmap;
+        [SerializeField, ShowIfNull] private Gridmap gmap;
+
+        public void OnCreate(Gridmap gmap)
+        {
+#if UNITY_EDITOR
+            this.gmap = gmap;
+#endif
+        }
 
         public void BakeMesh(BoundsInt editedBounds)
         {

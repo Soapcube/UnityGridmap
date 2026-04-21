@@ -21,18 +21,14 @@ namespace Gridmap.Brushes
         // Unsure what they do, but will reference later if necessary.
 
         [Header("Gridmap Brush Settings")]
-        [SerializeField, Tooltip("Whether this brush should automatically update the position of the tilemap to " +
-            "paint on different elevation layers.")] 
-        protected bool autoUpdateElevation;
         [SerializeField, Tooltip("The elevation of the brush relative to (0, 0, 0).")] 
-        protected int brushElevation;
+        protected int gridZ;
 
         #region Properties
-        public bool AutoUpdateElevation => autoUpdateElevation;
         public int BrushElevation
         {
-            get {  return brushElevation; }
-            set { brushElevation = value; }
+            get {  return gridZ; }
+            set { gridZ = value; }
         }
         #endregion
     }
