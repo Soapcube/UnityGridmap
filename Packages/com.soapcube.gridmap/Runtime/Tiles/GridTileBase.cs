@@ -7,8 +7,6 @@
 // Brief Description : Base class for mesh tiles that contain data about a mesh to paint on the gridmap.
 *****************************************************************************/
 
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
