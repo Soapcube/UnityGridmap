@@ -17,6 +17,12 @@ namespace Gridmap
         [SerializeField] private Vector3 offset;
         [SerializeField] private Material[] materials;
 
+
+        #region Properties
+        public Mesh Mesh { get =>  mesh; set => mesh = value; }
+        public Material[] Materials { get => materials; set => materials = value; }
+        #endregion
+
         internal override Vector3 Offset => offset;
 
         /// <summary>
