@@ -22,7 +22,7 @@ namespace Gridmap
         private static readonly Vector3Int chunkSize = new(16, 16, 16);
         #endregion
 
-        [SerializeField] private ChunkDictionary chunks;
+        [SerializeField, HideInInspector] private ChunkDictionary chunks;
 
         #region Component References
         [SerializeReference, ShowIfNull] private Tilemap tilemap;
