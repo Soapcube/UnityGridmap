@@ -13,7 +13,7 @@ namespace Gridmap
     [CreateAssetMenu(fileName = "MeshTile", menuName = "Gridmap/Mesh Tile")]
     public class MeshTile : GridTileBase
     {
-        [SerializeField] private Mesh testMesh;
+        [SerializeField] private Mesh mesh;
         [SerializeField] private Vector3 offset;
         [SerializeField] private Material[] materials;
 
@@ -25,7 +25,7 @@ namespace Gridmap
         /// <returns></returns>
         public override Mesh GetMesh()
         {
-            return testMesh;
+            return mesh;
         }
 
         public override Material[] GetMaterials()
