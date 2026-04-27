@@ -42,6 +42,8 @@ namespace Gridmap
         /// <returns>The tile at that position.</returns>
         public GridTileBase GetTileAtPoint(Vector3Int pos)
         {
+            // Flatten cell pos to 2D
+            pos.z = 0;
             return tilemap.GetTile(pos) as GridTileBase;
         }
 
@@ -52,6 +54,8 @@ namespace Gridmap
         /// <param name="cellPos"> the position of the cell to place at.</param>
         public void PlaceTileAtPoint(GridTileBase tile, Vector3Int cellPos)
         {
+            // Flatten cell pos to 2D.
+            cellPos.z = 0;
             Debug.Log($"Grid tile {tile} was added to GridmapPalette {name} at " +
                 $"position {cellPos}");
             tilemap.SetTile(cellPos, tile);

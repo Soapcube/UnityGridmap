@@ -141,7 +141,7 @@ namespace Gridmap
                     debugText += vertexIndex.ToString() + " ";
                 }
             }
-            Debug.Log(debugText);
+            //Debug.Log(debugText);
             Vector3[] newVertices = vertices[firstVertexIndex..(firstVertexIndex + submesh.vertexCount)];
 
             mesh.vertices = newVertices;
