@@ -68,5 +68,18 @@ namespace Gridmap
                 Debug.Log($"Tile: {gridTiles[i]}.  Index: {i}. Position: {cellPos}");
             }
         }
+
+        public Vector3 GridToCenteredPosition(Vector3Int gridPos)
+        {
+            Vector3 centeredPosition = gridPos;
+            for (int i = 0; i < 3; i++)
+            {
+                float cellSize = tilemap.layoutGrid.cellSize[i];
+                float startPos = gridPos[i] * cellSize;
+                centeredPosition[i] = Mathf.LerpUnclamped(startPos, startPos + cellSize,
+                    tilemap.tileAnchor[i]) + (gridPos[i] * tilemap.layoutGrid.cellGap[i]);
+            }
+            return centeredPosition;
+        }
     }
 }
