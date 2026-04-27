@@ -192,5 +192,10 @@ namespace Gridmap
                 }
             }
         }
+
+        public GridLayout.CellSwizzle GetSwizzle()
+        {
+            return tilemap.cellSwizzle;
+        }
     }
 }

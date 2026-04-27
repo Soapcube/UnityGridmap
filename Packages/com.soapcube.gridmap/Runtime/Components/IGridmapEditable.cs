@@ -16,5 +16,6 @@ namespace Gridmap
         GridTileBase GetTileAtPoint(Vector3Int cellPos);
         void BakeMesh(BoundsInt editedBounds);
         Vector3 GridToCenteredPosition(Vector3Int gridPos);
+        Grid.CellSwizzle GetSwizzle();
     }
 }

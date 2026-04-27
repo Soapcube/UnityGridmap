@@ -7,6 +7,7 @@
 // Brief Description : Relay script that reroutes all IGridmapEditable functions to a reference Gridmap.
 *****************************************************************************/
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 namespace Gridmap
 {
@@ -39,6 +40,11 @@ namespace Gridmap
         public Vector3 GridToCenteredPosition(Vector3Int gridPos)
         {
             return gmap.GridToCenteredPosition(gridPos);
+        }
+
+        public GridLayout.CellSwizzle GetSwizzle()
+        {
+            return gmap.GetSwizzle();
         }
     }
 }

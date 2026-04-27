@@ -81,6 +81,67 @@ namespace Gridmap
         }
 
         /// <summary>
+        /// Converts a Vector3 position to the correct axes specified by a grid swizzle.
+        /// </summary>
+        /// <param name="position">The position in XYZ coordinate space.</param>
+        /// <param name="targetSwizzleMode">The swizzle mode to convert the position into.</param>
+        /// <param name="baseSwizzleMode">The current swizzle mode of the position.</param>
+        /// <returns>The position in the specified swizzle mode.</returns>
+        public static Vector3 ConvertSwizzleSpace(Vector3 position,
+            Grid.CellSwizzle targetSwizzleMode,
+            Grid.CellSwizzle baseSwizzleMode = Grid.CellSwizzle.XYZ)
+        {
+            /// Gets the tuple that converts the position from base swizzle spacea into XYZ swizzle space.
+            (float, float, float) GetSwizzleTupleBase()
+            {
+                switch (baseSwizzleMode)
+                {
+                    case Grid.CellSwizzle.XZY:
+                        return (position.x, position.z, position.y);
+                    case Grid.CellSwizzle.YXZ:
+                        return (position.y, position.x, position.z);
+                    // Swaps the condition for the YZX and ZXY swizzles because they need to be inverted to convert from a
+                    // given swizzle space to XYZ
+                    case Grid.CellSwizzle.YZX:
+                        return (position.z, position.x, position.y);
+                    case Grid.CellSwizzle.ZXY:
+                        return (position.y, position.z, position.x);
+                    case Grid.CellSwizzle.ZYX:
+                        return (position.z, position.y, position.x);
+                    default:
+                        return (position.x, position.y, position.z);
+                }
+            }
+
+            /// Gets the tuple that converts the position from XYZ swizzle space to the target space.
+            (float, float, float) GetSwizzleTupleTarget()
+            {
+                switch (targetSwizzleMode)
+                {
+                    case Grid.CellSwizzle.XZY:
+                        return (position.x, position.z, position.y);
+                    case Grid.CellSwizzle.YXZ:
+                        return (position.y, position.x, position.z);
+                    // This condition gets inverted for GetSwizzleTupleBase
+                    case Grid.CellSwizzle.YZX:
+                        return (position.y, position.z, position.x);
+                    // This condition gets inverted for GetSwizzleTupleBase
+                    case Grid.CellSwizzle.ZXY:
+                        return (position.z, position.x, position.y);
+                    case Grid.CellSwizzle.ZYX:
+                        return (position.z, position.y, position.x);
+                    default:
+                        return (position.x, position.y, position.z);
+                }
+            }
+
+            (position.x, position.y, position.z) = GetSwizzleTupleBase();
+            (position.x, position.y, position.z) = GetSwizzleTupleTarget();
+
+            return position;
+        }
+
+        /// <summary>
         /// Returns the canonical modulus of a number to the mod of another number
         /// </summary>
         /// <remarks>

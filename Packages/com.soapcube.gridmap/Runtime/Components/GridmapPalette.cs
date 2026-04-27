@@ -7,6 +7,7 @@
 // Brief Description : Manages GridPalette prefabs and exposes functions for setting and getting specific tiles.
 Utilizes the tilemap's built-in functionality,as tile palettes are only 2D.
 *****************************************************************************/
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -16,16 +17,22 @@ namespace Gridmap
     public class GridmapPalette : MonoBehaviour, IGridmapEditable
     {
         [SerializeField, ReadOnly] private MeshFilter meshFilter;
+        [SerializeField, ReadOnly] private MeshRenderer meshRenderer;
         [SerializeField, ReadOnly] private Tilemap tilemap;
+        [SerializeField, ReadOnly] private Mesh mesh;
+
 
         /// <summary>
         /// Initialzies the GridPalette on creation.
         /// </summary>
         /// <param name="meshFilter"></param>
-        public void Initialize(MeshFilter meshFilter, Tilemap tilemap)
+        public void Initialize(MeshFilter meshFilter, MeshRenderer meshRenderer, Tilemap tilemap, Mesh mesh)
         {
             this.meshFilter = meshFilter;
+            this.meshRenderer = meshRenderer;
             this.tilemap = tilemap;
+            this.mesh = mesh;
+            mesh.MarkDynamic();
         }
 
         /// <summary>
@@ -59,14 +66,21 @@ namespace Gridmap
             tilemap.CompressBounds();
             GridTileBase[] gridTiles = tilemap.GetTilesBlock(tilemap.cellBounds).Select(x => x as GridTileBase).ToArray();
             // GridmapPalette will only have 1 mesh, so it just rebakes the mesh.
-            for (int i = 0; i < gridTiles.Length; i++)
+            //for (int i = 0; i < gridTiles.Length; i++)
+            //{
+            //    if (gridTiles[i] == null) { continue; }
+            //    Vector3Int cellPos = GridmapUtilities.IndexToPos(i, tilemap.cellBounds.size) + 
+            //        tilemap.cellBounds.position;
+            //    // Bake the mesh here.
+            //    Debug.Log($"Tile: {gridTiles[i]}.  Index: {i}. Position: {cellPos}");
+            //}
+
+            MeshHelper.BakeMesh(mesh, gridTiles, tilemap.cellBounds, this, out List<Material> materials);
+            if (materials == null)
             {
-                if (gridTiles[i] == null) { continue; }
-                Vector3Int cellPos = GridmapUtilities.IndexToPos(i, tilemap.cellBounds.size) + 
-                    tilemap.cellBounds.position;
-                // Bake the mesh here.
-                Debug.Log($"Tile: {gridTiles[i]}.  Index: {i}. Position: {cellPos}");
+                materials = new List<Material>();
             }
+            meshRenderer.SetMaterials(materials);
         }
 
         public Vector3 GridToCenteredPosition(Vector3Int gridPos)
@@ -80,6 +94,11 @@ namespace Gridmap
                     tilemap.tileAnchor[i]) + (gridPos[i] * tilemap.layoutGrid.cellGap[i]);
             }
             return centeredPosition;
+        }
+
+        public GridLayout.CellSwizzle GetSwizzle()
+        {
+            return tilemap.cellSwizzle;
         }
     }
 }
