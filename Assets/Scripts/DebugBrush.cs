@@ -11,7 +11,7 @@ using UnityEngine.XR;
 
 namespace Gridmap.Brushes
 {
-    [CreateAssetMenu(menuName = "Gridmap/Brushes/Debug Brush")]
+    [CreateAssetMenu(menuName = "Testing/Brushes/Debug Brush")]
     [CustomGridBrush(false, true, false, "Debug Brush")]
     public class DebugBrush : GridBrushBase
     {
