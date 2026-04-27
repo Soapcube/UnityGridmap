@@ -35,5 +35,10 @@ namespace Gridmap
         {
             gmap.PlaceTileAtPoint(tile, cellPos);
         }
+
+        public Vector3 GridToCenteredPosition(Vector3Int gridPos)
+        {
+            return gmap.GridToCenteredPosition(gridPos);
+        }
     }
 }
