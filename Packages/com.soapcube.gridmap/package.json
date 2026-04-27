@@ -2,7 +2,7 @@
   "name": "com.soapcube.gridmap",
   "version": "0.0.1",
   "displayName": "Gridmap",
-  "description": "A 3D Gridmap system for Unity designed to build 3D environments.",
+  "description": "A 3D Gridmap system based on the Tilemap package designed for building 3D environments.",
   "unity": "6000.2",
   "unityRelease": "7f2",
   "documentationUrl": "https://example.com/",

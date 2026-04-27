@@ -44,14 +44,16 @@ namespace Gridmap.Brushes.Editor
 
 
         // SerializedProperty variables.
-        private SerializedProperty brushElevation;
+        private SerializedProperty gridZ;
+
+        private bool updateSwizzle;
 
         /// <summary>
         /// Initialize SerializedProperties here.
         /// </summary>
         protected virtual void OnEnable()
         {
-            brushElevation = serializedObject.FindProperty(nameof(brushElevation));
+            gridZ = serializedObject.FindProperty(nameof(gridZ));
         }
 
         /// <summary>
@@ -63,6 +65,7 @@ namespace Gridmap.Brushes.Editor
 
             //EditorGUILayout.PropertyField(brushElevation);
             base.OnInspectorGUI();
+            //EditorGUILayout.PropertyField(gridZ);
 
             // Update the position of the tilemap based on the brushElevation.
 

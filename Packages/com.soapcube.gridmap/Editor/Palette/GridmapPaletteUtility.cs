@@ -64,7 +64,7 @@ namespace Gridmap.Editor
             paletteMesh.name = name + " Mesh";
 
             // Create the GridPalette prefab.
-            GameObject tempGo = CreatePaletteGameObject(name, layout, cellSize, paletteMesh);
+            GameObject tempGo = CreatePaletteGameObject(name, layout, cellSize, paletteMesh, new Vector3(0.5f, 0.5f, 0.5f));
             GameObject prefab = PrefabUtility.SaveAsPrefabAssetAndConnect(tempGo, pathName, 
                 InteractionMode.AutomatedAction);
 
@@ -92,7 +92,7 @@ namespace Gridmap.Editor
         /// <param name="paletteMesh">The mesh that stores rendering information about the grid palette.</param>
         /// <returns>The created grid palette GameObject.</returns>
         internal static GameObject CreatePaletteGameObject(string name, GridLayout.CellLayout layout, Vector3 cellSize, 
-            Mesh paletteMesh)
+            Mesh paletteMesh, Vector3 tileAnchor)
         {
             GameObject tempGo = new(name);
 
@@ -101,7 +101,7 @@ namespace Gridmap.Editor
             grid.cellSize = cellSize;
             grid.cellLayout = layout;
             grid.cellSwizzle = GridLayout.CellSwizzle.XYZ; // Always use XYZ swizzle.
-            Tilemap layer = CreatePaletteLayer(tempGo, DEFAULT_LAYER_NAME, layout, paletteMesh);
+            Tilemap layer = CreatePaletteLayer(tempGo, DEFAULT_LAYER_NAME, layout, paletteMesh, tileAnchor);
 
             // Configure GridMap specific components.
 
@@ -118,12 +118,13 @@ namespace Gridmap.Editor
         /// <param name="paletteMesh">The mesh that the layer uses to render the GridPalette.</param>
         /// <returns>The created tilemap component on the layer.</returns>
         private static Tilemap CreatePaletteLayer(GameObject palette, string layerName, GridLayout.CellLayout layout, 
-            Mesh paletteMesh)
+            Mesh paletteMesh, Vector3 tileAnchor)
         {
             GameObject layerGo = new GameObject(layerName);
             Tilemap tilemap = layerGo.AddComponent<Tilemap>();
             layerGo.transform.parent = palette.transform;
             layerGo.layer = palette.layer;
+            tilemap.tileAnchor = tileAnchor;
 
             // Set defaults for certain layouts.
             switch (layout)
@@ -139,7 +140,7 @@ namespace Gridmap.Editor
             meshFilter.sharedMesh = paletteMesh;
 
             GridmapPalette gmp = layerGo.AddComponent<GridmapPalette>();
-            gmp.Initialize(meshFilter, tilemap);
+            gmp.Initialize(meshFilter, meshRenderer, tilemap, paletteMesh);
             
             return tilemap;
         }

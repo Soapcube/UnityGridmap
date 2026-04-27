@@ -106,6 +106,8 @@ namespace Gridmap.Brushes
         /// <param name="pivot">The pivot of the picking brush,</param>
         public override void Pick(GridLayout gridLayout, GameObject brushTarget, BoundsInt position, Vector3Int pivot)
         {
+            // Offset position based on the brushElevation since it isn't applied automatically.
+            position.z += gridZ;
             if (brushTarget == null) { return; }
             if (!brushTarget.TryGetComponent(out IGridmapEditable gridmap)) { return; }
 
