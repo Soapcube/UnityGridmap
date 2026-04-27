@@ -118,15 +118,16 @@ namespace Gridmap
         /// </summary>
         public void BakeChunk()
         {
-            Mesh myMesh = BakeMesh();
-            meshFilter.sharedMesh = BakeMesh();
+            mesh = BakeMesh(tilesInChunk, out List<Material> materials);
+            meshRenderer.SetMaterials(materials);
+            meshFilter.sharedMesh = mesh;
         }
 
         /// <summary>
         /// Bakes the mesh in a simple way
         /// </summary>
         /// <returns>The baked mesh also saves the baked mesh to the MeshChunk's Mesh property</returns>
-        public Mesh BakeMesh()
+        public Mesh BakeMesh(GridTileBase[] tilesInChunk, out List<Material> returnedMaterials)
         {
             Mesh masterMesh = new();
             Dictionary<Material, List<CombineInstance>> instances = new();
@@ -190,6 +191,7 @@ namespace Gridmap
             }
             if(instances.Count == 0)
             {
+                returnedMaterials = null;
                 return null;
             }
             List<CombineInstance> finalInstance = new();
@@ -208,8 +210,8 @@ namespace Gridmap
             //masterMesh = finalInstance[0].mesh;
             //masterMesh.CombineMeshes(instances[instances.Keys.First()].ToArray(), true, true);
             masterMesh.CombineMeshes(finalInstance.ToArray(), false);
-            mesh = masterMesh;
-            meshRenderer.SetMaterials(instances.Keys.ToList());
+            //mesh = masterMesh;
+            returnedMaterials = instances.Keys.ToList();
 
             return masterMesh;
         }
