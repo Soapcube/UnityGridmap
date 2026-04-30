@@ -74,7 +74,10 @@ namespace Gridmap.Brushes
             }
 
             // Bake the mesh after all fills.
-            gridmap.BakeMesh(position);
+            if (gridmap is not GridmapPalette)
+            {
+                gridmap.BakeMesh(position);
+            }
         }
 
         public override void BoxErase(GridLayout gridLayout, GameObject brushTarget, BoundsInt position)
@@ -94,7 +97,10 @@ namespace Gridmap.Brushes
             }
 
             // Bake the mesh after all changes have been made.
-            gridmap.BakeMesh(position);
+            if (gridmap is not GridmapPalette)
+            {
+                gridmap.BakeMesh(position);
+            }
         }
 
         /// <summary>

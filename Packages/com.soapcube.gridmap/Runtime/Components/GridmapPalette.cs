@@ -22,6 +22,10 @@ namespace Gridmap
         [SerializeField, ReadOnly] private Mesh mesh;
 
 
+        #region Properties
+        public Mesh Mesh => mesh;
+        #endregion
+
         /// <summary>
         /// Initialzies the GridPalette on creation.
         /// </summary>
@@ -67,6 +71,7 @@ namespace Gridmap
         /// <param name="editedBounds">The bounds of the changed tiles.  Unused.</param>
         public void BakeMesh(BoundsInt editedBounds)
         {
+            Debug.Log("Baking");
             tilemap.CompressBounds();
             GridTileBase[] gridTiles = tilemap.GetTilesBlock(tilemap.cellBounds).Select(x => x as GridTileBase).ToArray();
             // GridmapPalette will only have 1 mesh, so it just rebakes the mesh.
@@ -92,10 +97,15 @@ namespace Gridmap
             Vector3 centeredPosition = gridPos;
             for (int i = 0; i < 3; i++)
             {
-                float cellSize = tilemap.layoutGrid.cellSize[i];
+                GridLayout grid = tilemap.layoutGrid;
+                if (grid == null)
+                {
+                    grid = transform.parent.GetComponent<GridLayout>();
+                }
+                float cellSize = grid.cellSize[i];
                 float startPos = gridPos[i] * cellSize;
                 centeredPosition[i] = Mathf.LerpUnclamped(startPos, startPos + cellSize,
-                    tilemap.tileAnchor[i]) + (gridPos[i] * tilemap.layoutGrid.cellGap[i]);
+                    tilemap.tileAnchor[i]) + (gridPos[i] * grid.cellGap[i]);
             }
             return centeredPosition;
         }

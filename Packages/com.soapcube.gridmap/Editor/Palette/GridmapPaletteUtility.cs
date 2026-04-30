@@ -69,7 +69,7 @@ namespace Gridmap.Editor
                 InteractionMode.AutomatedAction);
 
             // Create the SO that configures palette settings.
-            GridPalette palette = CreatePaletteSettings();
+            GridmapPaletteData palette = CreatePaletteSettings();
 
             // Add Sub-Assets.
             AssetDatabase.AddObjectToAsset(palette, prefab);
@@ -149,9 +149,9 @@ namespace Gridmap.Editor
         /// Creates the GridPalette ScriptableObject that holds the grid settings
         /// </summary>
         /// <returns>The GridPalette ScriptableObject that holds the palette's editor settings.</returns>
-        internal static GridPalette CreatePaletteSettings()
+        internal static GridmapPaletteData CreatePaletteSettings()
         {
-            GridPalette paletteSo = ScriptableObject.CreateInstance<GridPalette>();
+            GridmapPaletteData paletteSo = ScriptableObject.CreateInstance<GridmapPaletteData>();
 
             paletteSo.name = DEFAULT_PALETTESO_NAME;
             // Set some default settings as these shouldn't need to change.

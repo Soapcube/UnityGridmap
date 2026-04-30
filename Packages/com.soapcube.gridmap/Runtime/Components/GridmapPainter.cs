@@ -15,6 +15,10 @@ namespace Gridmap
     {
         [SerializeField, ShowIfNull] private Gridmap gmap;
 
+        #region Properties
+        public Gridmap Gridmap => gmap;
+        #endregion
+
         public void OnCreate(Gridmap gmap)
         {
 #if UNITY_EDITOR
@@ -45,6 +49,11 @@ namespace Gridmap
         public GridLayout.CellSwizzle GetSwizzle()
         {
             return gmap.GetSwizzle();
+        }
+
+        public IGridmapEditable GetGridmapRoot()
+        {
+            return gmap;
         }
     }
 }
