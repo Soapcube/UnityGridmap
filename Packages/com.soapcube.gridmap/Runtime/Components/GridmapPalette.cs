@@ -60,8 +60,8 @@ namespace Gridmap
         {
             // Flatten cell pos to 2D.
             cellPos.z = 0;
-            Debug.Log($"Grid tile {tile} was added to GridmapPalette {name} at " +
-                $"position {cellPos}");
+            //Debug.Log($"Grid tile {tile} was added to GridmapPalette {name} at " +
+            //    $"position {cellPos}");
             tilemap.SetTile(cellPos, tile);
         }
 
@@ -71,8 +71,18 @@ namespace Gridmap
         /// <param name="editedBounds">The bounds of the changed tiles.  Unused.</param>
         public void BakeMesh(BoundsInt editedBounds)
         {
-            Debug.Log("Baking");
             tilemap.CompressBounds();
+
+            List<Material> materials = BakeMeshAsset();
+            if (materials == null)
+            {
+                materials = new List<Material>();
+            }
+            meshRenderer.SetMaterials(materials);
+        }
+
+        public List<Material> BakeMeshAsset()
+        {
             GridTileBase[] gridTiles = tilemap.GetTilesBlock(tilemap.cellBounds).Select(x => x as GridTileBase).ToArray();
             // GridmapPalette will only have 1 mesh, so it just rebakes the mesh.
             //for (int i = 0; i < gridTiles.Length; i++)
@@ -85,11 +95,7 @@ namespace Gridmap
             //}
 
             MeshHelper.BakeMesh(mesh, gridTiles, tilemap.cellBounds, this, out List<Material> materials);
-            if (materials == null)
-            {
-                materials = new List<Material>();
-            }
-            meshRenderer.SetMaterials(materials);
+            return materials;
         }
 
         public Vector3 GridToCenteredPosition(Vector3Int gridPos)

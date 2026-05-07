@@ -73,7 +73,11 @@ namespace Gridmap.Editor
 
             // Add Sub-Assets.
             AssetDatabase.AddObjectToAsset(palette, prefab);
-            AssetDatabase.AddObjectToAsset(paletteMesh, prefab);
+            // I want to make sub-assets work, but they conflict with how palettes are saved.  Going to do some research.
+            //AssetDatabase.AddObjectToAsset(paletteMesh, prefab); 
+
+            string directory = Path.GetDirectoryName(pathName);
+            AssetDatabase.CreateAsset(paletteMesh, Path.Combine(directory, paletteMesh.name + ".asset"));
 
             PrefabUtility.ApplyPrefabInstance(tempGo, InteractionMode.AutomatedAction);
             AssetDatabase.Refresh();
@@ -160,6 +164,13 @@ namespace Gridmap.Editor
             paletteSo.transparencySortMode = TransparencySortMode.Default;
 
             return paletteSo;
+        }
+
+        private static void SetHideFlagsRecursively(GameObject root, HideFlags flags)
+        {
+            root.hideFlags = flags;
+            for (int i = 0; i < root.transform.childCount; i++)
+                SetHideFlagsRecursively(root.transform.GetChild(i).gameObject, flags);
         }
 
         #region Mesh Management

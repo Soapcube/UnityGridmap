@@ -6,11 +6,12 @@
 //
 // Brief Description : Automatically updates and GridPalettes when their associated tilemap changes.
 *****************************************************************************/
+using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
+using UnityEditor.Tilemaps;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using UnityEditor.EditorTools;
 
 namespace Gridmap.Editor
 {
@@ -21,6 +22,8 @@ namespace Gridmap.Editor
         private const string PALETTE_UNDO_NAME = "Edit Palette";
         #endregion
 
+        private static Dictionary<int, GridmapPalette> undoPaletteDict = new Dictionary<int, GridmapPalette>();
+
         /// <summary>
         /// Subscribe to tilemap changed event.
         /// </summary>
@@ -28,6 +31,7 @@ namespace Gridmap.Editor
         {
             Tilemap.tilemapTileChanged += UpdateGridPalette;
             Undo.undoRedoEvent += UpdateGridPaletteUndo;
+
         }
 
         /// <summary>
@@ -36,21 +40,29 @@ namespace Gridmap.Editor
         /// <param name="info"></param>
         private static void UpdateGridPaletteUndo(in UndoRedoInfo info)
         {
-            if (info.undoName == "Edit Palette")
+            Debug.Log(info.undoGroup);
+            if (!undoPaletteDict.ContainsKey(info.undoGroup)) { return; }
+            GridmapPalette paletteInstance = undoPaletteDict[info.undoGroup];
+            if (info.undoName == PALETTE_UNDO_NAME)
             {
-                string[] assetGUIDs = AssetDatabase.FindAssets("t:GridmapPaletteData");
-                foreach (string assetGUID in assetGUIDs)
-                {
-                    string path = AssetDatabase.GUIDToAssetPath(assetGUID);
-                    GameObject paletteGo = AssetDatabase.LoadAssetAtPath<GameObject>(path);
-                    GridmapPalette palette = paletteGo.GetComponentInChildren<GridmapPalette>();
-                    if (palette != null)
-                    {
-                        // Pass in an empty BoundsInt as the bounds passed to a Palette doesn't matter.
-                        Debug.Log("Baking " + palette);
-                        palette.BakeMesh(new BoundsInt());
-                    }
-                }
+                // Only bake the mesh itself, no changes to the palette.
+                paletteInstance.BakeMeshAsset();
+                EditorUtility.SetDirty(paletteInstance.Mesh);
+
+                //string[] assetGUIDs = AssetDatabase.FindAssets("t:GridmapPaletteData");
+                //foreach (string assetGUID in assetGUIDs)
+                //{
+                //    // So this whole bit is wrong.  The issue is that the palette is saved on an instance before 
+                //    // changes are applied to the prefab.  So I need to rebake the instance's mesh.
+                //    string path = AssetDatabase.GUIDToAssetPath(assetGUID);
+                //    GameObject paletteGo = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+                //    GridmapPalette palette = paletteGo.GetComponentInChildren<GridmapPalette>();
+                //    // Compare to the
+                //    if (palette != null && paletteInstance.Mesh == palette.Mesh)
+                //    {
+                        
+                //    }
+                //}
             }
             
         }
@@ -62,7 +74,8 @@ namespace Gridmap.Editor
         /// <param name="tileChanges"> information on the tiles that were changed.</param>
         private static void UpdateGridPalette(Tilemap tilemap, Tilemap.SyncTile[] tileChanges)
         {
-            if (tilemap.TryGetComponent(out GridmapPalette gridmapPalette))
+
+            if (tilemap.TryGetComponent(out GridmapPalette palette))
             {
                 //foreach(Tilemap.SyncTile tileSync in tileChanges)
                 //{
@@ -73,8 +86,21 @@ namespace Gridmap.Editor
                 //}
                 BoundsInt editedBounds = 
                     GridmapUtilities.GetBoundsFromPositions(tileChanges.Select(x => x.position).ToArray());
-                gridmapPalette.BakeMesh(editedBounds);
+                palette.BakeMesh(editedBounds);
+
+                // Log the change to the palette in the undo dict using the current undo group so it can be tracked.
+                undoPaletteDict.Add(Undo.GetCurrentGroup(), palette);
+
+                // Save changes to the prefab.
+                EditorUtility.SetDirty(palette.Mesh);
+                Debug.Log(Undo.GetCurrentGroup() + " " + Undo.GetCurrentGroupName());
             }
+        }
+
+        private static GameObject GetPaletteRoot(GridmapPalette palette)
+        {
+            if (palette == null) { return null; }
+            return palette.GetComponentInParent<Grid>().gameObject;
         }
     }
 }
