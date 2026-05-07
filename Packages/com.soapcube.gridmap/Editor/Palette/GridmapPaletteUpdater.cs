@@ -23,6 +23,8 @@ namespace Gridmap.Editor
         #endregion
 
         private static Dictionary<int, GridmapPalette> undoPaletteDict = new Dictionary<int, GridmapPalette>();
+        // Saves links between palette assets and palette instances created by the clipboard.
+        private static Dictionary<GameObject, GridmapPalette> instancePrefabDict = new Dictionary<GameObject, GridmapPalette>();
 
         /// <summary>
         /// Subscribe to tilemap changed event.
@@ -91,16 +93,92 @@ namespace Gridmap.Editor
                 // Log the change to the palette in the undo dict using the current undo group so it can be tracked.
                 undoPaletteDict.Add(Undo.GetCurrentGroup(), palette);
 
+                // Save a link to this palette instance from the asset.
+                string path = GetPalettePath(palette);
+                GameObject paletteAsset = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+                if (!instancePrefabDict.ContainsKey(paletteAsset))
+                {
+                    instancePrefabDict.Add(paletteAsset, palette);
+                }
+                
                 // Save changes to the prefab.
                 EditorUtility.SetDirty(palette.Mesh);
-                Debug.Log(Undo.GetCurrentGroup() + " " + Undo.GetCurrentGroupName());
+                //Debug.Log(Undo.GetCurrentGroup() + " " + Undo.GetCurrentGroupName());
             }
         }
 
-        private static GameObject GetPaletteRoot(GridmapPalette palette)
+
+
+        /// <summary>
+        /// Gets the palette asset GameObject from a palette.
+        /// </summary>
+        /// <param name="palette"></param>
+        /// <returns></returns>
+        private static string GetPalettePath(GridmapPalette palette)
         {
-            if (palette == null) { return null; }
-            return palette.GetComponentInParent<Grid>().gameObject;
+            return AssetDatabase.GetAssetPath(palette.PaletteData);
         }
+
+
+        public class GridmapPaletteAssetModificationProcessor : AssetModificationProcessor
+        {
+            static string[] OnWillSaveAssets(string[] paths)
+            {
+                // Check for palette modifications.
+                foreach(string path in paths)
+                {
+                    if(AssetDatabase.LoadAssetAtPath<GridmapPaletteData>(path) != null)
+                    {
+                        GameObject paletteGo = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+                        GridmapPalette palette = paletteGo.GetComponentInChildren<GridmapPalette>();
+
+                        GridmapPalette paletteInstance = instancePrefabDict[paletteGo];
+
+                        CopyTo(paletteInstance.Mesh, palette.Mesh);
+                        paletteInstance.Mesh = palette.Mesh;
+                    }
+                }
+
+                string debug = "Saving Assets: ";
+                foreach (string path in paths)
+                {
+                    debug += path + ", ";
+                }
+                Debug.Log(debug);
+                return paths;
+            }
+
+
+        }
+
+        private static void CopyTo(Mesh original, Mesh target)
+        {
+            target.name = original.name;
+            target.vertices = original.vertices;
+            target.normals = original.normals;
+            target.tangents = original.tangents;
+            target.triangles = original.triangles;
+            target.bounds = original.bounds;
+            target.uv = original.uv;
+            target.uv2 = original.uv2;
+            target.uv3 = original.uv3;
+            target.uv4 = original.uv4;
+            target.uv5 = original.uv5;
+            target.uv6 = original.uv6;
+            target.uv7 = original.uv7;
+            target.uv8 = original.uv8;
+            target.colors = original.colors;
+            target.bindposes = original.bindposes;
+            target.boneWeights = original.boneWeights;
+            target.indexFormat = original.indexFormat;
+            target.indexBufferTarget = original.indexBufferTarget;
+            target.vertexBufferTarget = original.vertexBufferTarget;
+            target.subMeshCount = original.subMeshCount;
+            for(int i = 0; i < original.subMeshCount; i++)
+            {
+                target.SetSubMesh(i, original.GetSubMesh(i));
+            }
+        }
+
     }
 }

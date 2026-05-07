@@ -63,21 +63,21 @@ namespace Gridmap.Editor
             paletteMesh.MarkDynamic();
             paletteMesh.name = name + " Mesh";
 
-            // Create the GridPalette prefab.
-            GameObject tempGo = CreatePaletteGameObject(name, layout, cellSize, paletteMesh, new Vector3(0.5f, 0.5f, 0.5f));
-            GameObject prefab = PrefabUtility.SaveAsPrefabAssetAndConnect(tempGo, pathName, 
-                InteractionMode.AutomatedAction);
-
             // Create the SO that configures palette settings.
             GridmapPaletteData palette = CreatePaletteSettings();
+
+            // Create the GridPalette prefab.
+            GameObject tempGo = CreatePaletteGameObject(name, layout, cellSize, paletteMesh, new Vector3(0.5f, 0.5f, 0.5f), palette);
+            GameObject prefab = PrefabUtility.SaveAsPrefabAssetAndConnect(tempGo, pathName, 
+                InteractionMode.AutomatedAction);
 
             // Add Sub-Assets.
             AssetDatabase.AddObjectToAsset(palette, prefab);
             // I want to make sub-assets work, but they conflict with how palettes are saved.  Going to do some research.
-            //AssetDatabase.AddObjectToAsset(paletteMesh, prefab); 
+            AssetDatabase.AddObjectToAsset(paletteMesh, prefab); 
 
-            string directory = Path.GetDirectoryName(pathName);
-            AssetDatabase.CreateAsset(paletteMesh, Path.Combine(directory, paletteMesh.name + ".asset"));
+            //string directory = Path.GetDirectoryName(pathName);
+            //AssetDatabase.CreateAsset(paletteMesh, Path.Combine(directory, paletteMesh.name + ".asset"));
 
             PrefabUtility.ApplyPrefabInstance(tempGo, InteractionMode.AutomatedAction);
             AssetDatabase.Refresh();
@@ -96,7 +96,7 @@ namespace Gridmap.Editor
         /// <param name="paletteMesh">The mesh that stores rendering information about the grid palette.</param>
         /// <returns>The created grid palette GameObject.</returns>
         internal static GameObject CreatePaletteGameObject(string name, GridLayout.CellLayout layout, Vector3 cellSize, 
-            Mesh paletteMesh, Vector3 tileAnchor)
+            Mesh paletteMesh, Vector3 tileAnchor, GridPalette palette)
         {
             GameObject tempGo = new(name);
 
@@ -105,7 +105,7 @@ namespace Gridmap.Editor
             grid.cellSize = cellSize;
             grid.cellLayout = layout;
             grid.cellSwizzle = GridLayout.CellSwizzle.XYZ; // Always use XYZ swizzle.
-            Tilemap layer = CreatePaletteLayer(tempGo, DEFAULT_LAYER_NAME, layout, paletteMesh, tileAnchor);
+            Tilemap layer = CreatePaletteLayer(tempGo, DEFAULT_LAYER_NAME, layout, paletteMesh, tileAnchor, palette);
 
             // Configure GridMap specific components.
 
@@ -122,7 +122,7 @@ namespace Gridmap.Editor
         /// <param name="paletteMesh">The mesh that the layer uses to render the GridPalette.</param>
         /// <returns>The created tilemap component on the layer.</returns>
         private static Tilemap CreatePaletteLayer(GameObject palette, string layerName, GridLayout.CellLayout layout, 
-            Mesh paletteMesh, Vector3 tileAnchor)
+            Mesh paletteMesh, Vector3 tileAnchor, GridPalette paletteData)
         {
             GameObject layerGo = new GameObject(layerName);
             Tilemap tilemap = layerGo.AddComponent<Tilemap>();
@@ -144,7 +144,7 @@ namespace Gridmap.Editor
             meshFilter.sharedMesh = paletteMesh;
 
             GridmapPalette gmp = layerGo.AddComponent<GridmapPalette>();
-            gmp.Initialize(meshFilter, meshRenderer, tilemap, paletteMesh);
+            gmp.Initialize(meshFilter, meshRenderer, tilemap, paletteMesh, paletteData);
             
             return tilemap;
         }

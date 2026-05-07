@@ -9,33 +9,45 @@ Utilizes the tilemap's built-in functionality,as tile palettes are only 2D.
 *****************************************************************************/
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
 namespace Gridmap
 {
+    [AddComponentMenu("GameObject/")] // Hides the palette in the AddComponent menu so it cant be used.
     public class GridmapPalette : MonoBehaviour, IGridmapEditable
     {
         [SerializeField, ReadOnly] private MeshFilter meshFilter;
         [SerializeField, ReadOnly] private MeshRenderer meshRenderer;
         [SerializeField, ReadOnly] private Tilemap tilemap;
         [SerializeField, ReadOnly] private Mesh mesh;
-
+        [SerializeField, ReadOnly] private ScriptableObject paletteData;
 
         #region Properties
-        public Mesh Mesh => mesh;
+        public Mesh Mesh
+        { 
+            get {  return mesh; }
+            set
+            {
+                mesh = value;
+                meshFilter.sharedMesh = value;
+            }
+        }
+        public ScriptableObject PaletteData => paletteData;
         #endregion
 
         /// <summary>
         /// Initialzies the GridPalette on creation.
         /// </summary>
         /// <param name="meshFilter"></param>
-        public void Initialize(MeshFilter meshFilter, MeshRenderer meshRenderer, Tilemap tilemap, Mesh mesh)
+        public void Initialize(MeshFilter meshFilter, MeshRenderer meshRenderer, Tilemap tilemap, Mesh mesh, ScriptableObject paletteData)
         {
             this.meshFilter = meshFilter;
             this.meshRenderer = meshRenderer;
             this.tilemap = tilemap;
             this.mesh = mesh;
+            this.paletteData = paletteData;
             mesh.MarkDynamic();
         }
 
