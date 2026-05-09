@@ -9,29 +9,45 @@ Utilizes the tilemap's built-in functionality,as tile palettes are only 2D.
 *****************************************************************************/
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
 namespace Gridmap
 {
+    [AddComponentMenu("GameObject/")] // Hides the palette in the AddComponent menu so it cant be used.
     public class GridmapPalette : MonoBehaviour, IGridmapEditable
     {
         [SerializeField, ReadOnly] private MeshFilter meshFilter;
         [SerializeField, ReadOnly] private MeshRenderer meshRenderer;
         [SerializeField, ReadOnly] private Tilemap tilemap;
         [SerializeField, ReadOnly] private Mesh mesh;
+        [SerializeField, ReadOnly] private ScriptableObject paletteData;
 
+        #region Properties
+        public Mesh Mesh
+        { 
+            get {  return mesh; }
+            set
+            {
+                mesh = value;
+                meshFilter.sharedMesh = value;
+            }
+        }
+        public ScriptableObject PaletteData => paletteData;
+        #endregion
 
         /// <summary>
         /// Initialzies the GridPalette on creation.
         /// </summary>
         /// <param name="meshFilter"></param>
-        public void Initialize(MeshFilter meshFilter, MeshRenderer meshRenderer, Tilemap tilemap, Mesh mesh)
+        public void Initialize(MeshFilter meshFilter, MeshRenderer meshRenderer, Tilemap tilemap, Mesh mesh, ScriptableObject paletteData)
         {
             this.meshFilter = meshFilter;
             this.meshRenderer = meshRenderer;
             this.tilemap = tilemap;
             this.mesh = mesh;
+            this.paletteData = paletteData;
             mesh.MarkDynamic();
         }
 
@@ -56,8 +72,8 @@ namespace Gridmap
         {
             // Flatten cell pos to 2D.
             cellPos.z = 0;
-            Debug.Log($"Grid tile {tile} was added to GridmapPalette {name} at " +
-                $"position {cellPos}");
+            //Debug.Log($"Grid tile {tile} was added to GridmapPalette {name} at " +
+            //    $"position {cellPos}");
             tilemap.SetTile(cellPos, tile);
         }
 
@@ -67,19 +83,13 @@ namespace Gridmap
         /// <param name="editedBounds">The bounds of the changed tiles.  Unused.</param>
         public void BakeMesh(BoundsInt editedBounds)
         {
+            // When a palette is baked, it creates a new mesh each time that's not saved as an asset.
+            // Asset changes are stored on save.
             tilemap.CompressBounds();
-            GridTileBase[] gridTiles = tilemap.GetTilesBlock(tilemap.cellBounds).Select(x => x as GridTileBase).ToArray();
-            // GridmapPalette will only have 1 mesh, so it just rebakes the mesh.
-            //for (int i = 0; i < gridTiles.Length; i++)
-            //{
-            //    if (gridTiles[i] == null) { continue; }
-            //    Vector3Int cellPos = GridmapUtilities.IndexToPos(i, tilemap.cellBounds.size) + 
-            //        tilemap.cellBounds.position;
-            //    // Bake the mesh here.
-            //    Debug.Log($"Tile: {gridTiles[i]}.  Index: {i}. Position: {cellPos}");
-            //}
 
-            MeshHelper.BakeMesh(mesh, gridTiles, tilemap.cellBounds, this, out List<Material> materials);
+            GridTileBase[] gridTiles = tilemap.GetTilesBlock(tilemap.cellBounds).Select(x => x as GridTileBase).ToArray();
+
+            Mesh = MeshHelper.BakeMesh(gridTiles, tilemap.cellBounds, this, out List<Material> materials);
             if (materials == null)
             {
                 materials = new List<Material>();
@@ -92,10 +102,15 @@ namespace Gridmap
             Vector3 centeredPosition = gridPos;
             for (int i = 0; i < 3; i++)
             {
-                float cellSize = tilemap.layoutGrid.cellSize[i];
+                GridLayout grid = tilemap.layoutGrid;
+                if (grid == null)
+                {
+                    grid = transform.parent.GetComponent<GridLayout>();
+                }
+                float cellSize = grid.cellSize[i];
                 float startPos = gridPos[i] * cellSize;
                 centeredPosition[i] = Mathf.LerpUnclamped(startPos, startPos + cellSize,
-                    tilemap.tileAnchor[i]) + (gridPos[i] * tilemap.layoutGrid.cellGap[i]);
+                    tilemap.tileAnchor[i]) + (gridPos[i] * grid.cellGap[i]);
             }
             return centeredPosition;
         }

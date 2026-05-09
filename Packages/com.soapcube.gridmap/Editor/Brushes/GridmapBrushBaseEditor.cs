@@ -46,8 +46,6 @@ namespace Gridmap.Brushes.Editor
         // SerializedProperty variables.
         private SerializedProperty gridZ;
 
-        private bool updateSwizzle;
-
         /// <summary>
         /// Initialize SerializedProperties here.
         /// </summary>

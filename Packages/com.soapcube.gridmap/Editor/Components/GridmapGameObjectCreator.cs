@@ -56,6 +56,7 @@ namespace Gridmap.Editor
             Tilemap painting = CreatePaintingLayer(gmap, gridmapGo.transform, new Vector3(0.5f, 0.5f, 0.5f));
 
             // Setup Components
+            Undo.RecordObject(gmap, "Assign Gridmap Components");
             gmap.OnCreate(painting);
 
             Selection.activeObject = gridmapGo;
@@ -74,6 +75,7 @@ namespace Gridmap.Editor
             GameObject paintGo = ObjectFactory.CreateGameObject(gmap.name, typeof(Tilemap), typeof(GridmapPainter));
             Undo.SetTransformParent(paintGo.transform, parent.transform, "");
 
+            // Unity is bugged and won't record hide flags in the undo stack.
             paintGo.hideFlags = GridmapUtilities.GRIDMAP_SUB_HIDEFLAGS;
 
             // Setup components.
@@ -81,7 +83,9 @@ namespace Gridmap.Editor
             Tilemap tmap = paintGo.GetComponent<Tilemap>();
             tmap.tileAnchor = anchor;
             GridmapPainter painter = paintGo.GetComponent<GridmapPainter>();
+            Undo.RecordObject(painter, "Set painter variables.");
             painter.OnCreate(gmap);
+            Undo.RegisterCompleteObjectUndo(paintGo, "Create Painter");
 
             return tmap;
         }
