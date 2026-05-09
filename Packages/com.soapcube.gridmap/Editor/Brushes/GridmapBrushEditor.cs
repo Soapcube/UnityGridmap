@@ -23,13 +23,11 @@ namespace Gridmap.Brushes.Editor
         {
             if (brushTarget != null)
             {
-                if(brushTarget.TryGetComponent(out IGridmapEditable editable))
+                IGridmapEditable editable = brushTarget.GetComponentInParent<IGridmapEditable>();
+                if (editable == null) { return; }
                 {
                     switch(editable)
                     {
-                        case GridmapPainter painter:
-                            RegisterGridmapUndo(painter.Gridmap, tool.ToString());
-                            break;
                         case Gridmap gridmap:
                             RegisterGridmapUndo(gridmap, tool.ToString());
                             break;
