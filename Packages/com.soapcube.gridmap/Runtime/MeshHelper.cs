@@ -152,5 +152,55 @@ namespace Gridmap
 
             return mesh;
         }
+
+        #region Copying
+        /// <summary>
+        /// Creates a new mesh that's a copy of a given mesh.
+        /// </summary>
+        /// <param name="inMesh">The mesh to copy.</param>
+        /// <returns>A new mesh thats a copy of the given mesh.</returns>
+        public static Mesh Copy(this Mesh inMesh)
+        {
+            Mesh mesh = new Mesh();
+            inMesh.CopyTo(mesh, true);
+            return mesh;
+        }
+        /// <summary>
+        /// Copies a mesh to another existing mesh.
+        /// </summary>
+        /// <param name="original">The mesh to copy.</param>
+        /// <param name="target">The target mesh to copy data to.</param>
+        public static void CopyTo(this Mesh original, Mesh target, bool copyName = false)
+        {
+            if (copyName)
+            {
+                target.name = original.name;
+            }
+            target.vertices = original.vertices;
+            target.normals = original.normals;
+            target.tangents = original.tangents;
+            target.triangles = original.triangles;
+            target.bounds = original.bounds;
+            target.uv = original.uv;
+            target.uv2 = original.uv2;
+            target.uv3 = original.uv3;
+            target.uv4 = original.uv4;
+            target.uv5 = original.uv5;
+            target.uv6 = original.uv6;
+            target.uv7 = original.uv7;
+            target.uv8 = original.uv8;
+            target.colors = original.colors;
+            target.bindposes = original.bindposes;
+            target.boneWeights = original.boneWeights;
+            target.indexFormat = original.indexFormat;
+            target.indexBufferTarget = original.indexBufferTarget;
+            target.vertexBufferTarget = original.vertexBufferTarget;
+            target.subMeshCount = original.subMeshCount;
+            for (int i = 0; i < original.subMeshCount; i++)
+            {
+                target.SetSubMesh(i, original.GetSubMesh(i));
+            }
+        }
+        #endregion
     }
 }

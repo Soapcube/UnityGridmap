@@ -31,40 +31,24 @@ namespace Gridmap.Editor
         /// </summary>
         static GridmapPaletteUpdater()
         {
-            Tilemap.tilemapTileChanged += UpdateGridPalette;
-            Undo.undoRedoEvent += UpdateGridPaletteUndo;
+            Tilemap.tilemapTileChanged += UpdatePaletteInstance;
+            Undo.undoRedoEvent += GridPaletteUndo;
 
         }
 
         /// <summary>
-        /// Rebakes the mesh when the palette is updated from an undo.
+        /// Rebakes the mesh of a palette instance when the palette is updated from an undo.
         /// </summary>
         /// <param name="info"></param>
-        private static void UpdateGridPaletteUndo(in UndoRedoInfo info)
+        private static void GridPaletteUndo(in UndoRedoInfo info)
         {
-            Debug.Log(info.undoGroup);
             if (!undoPaletteDict.ContainsKey(info.undoGroup)) { return; }
             GridmapPalette paletteInstance = undoPaletteDict[info.undoGroup];
             if (info.undoName == PALETTE_UNDO_NAME)
             {
                 // Only bake the mesh itself, no changes to the palette.
-                paletteInstance.BakeMeshAsset();
-                EditorUtility.SetDirty(paletteInstance.Mesh);
-
-                //string[] assetGUIDs = AssetDatabase.FindAssets("t:GridmapPaletteData");
-                //foreach (string assetGUID in assetGUIDs)
-                //{
-                //    // So this whole bit is wrong.  The issue is that the palette is saved on an instance before 
-                //    // changes are applied to the prefab.  So I need to rebake the instance's mesh.
-                //    string path = AssetDatabase.GUIDToAssetPath(assetGUID);
-                //    GameObject paletteGo = AssetDatabase.LoadAssetAtPath<GameObject>(path);
-                //    GridmapPalette palette = paletteGo.GetComponentInChildren<GridmapPalette>();
-                //    // Compare to the
-                //    if (palette != null && paletteInstance.Mesh == palette.Mesh)
-                //    {
-                        
-                //    }
-                //}
+                //paletteInstance.BakeMeshRaw();
+                //EditorUtility.SetDirty(paletteInstance.Mesh);
             }
             
         }
@@ -74,18 +58,11 @@ namespace Gridmap.Editor
         /// </summary>
         /// <param name="tilemap">The tilemap that was modified.</param>
         /// <param name="tileChanges"> information on the tiles that were changed.</param>
-        private static void UpdateGridPalette(Tilemap tilemap, Tilemap.SyncTile[] tileChanges)
+        private static void UpdatePaletteInstance(Tilemap tilemap, Tilemap.SyncTile[] tileChanges)
         {
 
             if (tilemap.TryGetComponent(out GridmapPalette palette))
             {
-                //foreach(Tilemap.SyncTile tileSync in tileChanges)
-                //{
-                //    if (tileSync.tile is GridTileBase gridTile)
-                //    {
-                //        gridmapPalette.PlaceTileAtPoint(gridTile, tileSync.position);
-                //    }
-                //}
                 BoundsInt editedBounds = 
                     GridmapUtilities.GetBoundsFromPositions(tileChanges.Select(x => x.position).ToArray());
                 palette.BakeMesh(editedBounds);
@@ -100,10 +77,10 @@ namespace Gridmap.Editor
                 {
                     instancePrefabDict.Add(paletteAsset, palette);
                 }
-                
-                // Save changes to the prefab.
-                EditorUtility.SetDirty(palette.Mesh);
-                //Debug.Log(Undo.GetCurrentGroup() + " " + Undo.GetCurrentGroupName());
+                else if(instancePrefabDict[paletteAsset] == null)
+                {
+                    instancePrefabDict[paletteAsset] = palette;
+                }
             }
         }
 
@@ -119,7 +96,7 @@ namespace Gridmap.Editor
             return AssetDatabase.GetAssetPath(palette.PaletteData);
         }
 
-
+        // Handles applying mesh changes when the palette instance is saved.
         public class GridmapPaletteAssetModificationProcessor : AssetModificationProcessor
         {
             static string[] OnWillSaveAssets(string[] paths)
@@ -127,14 +104,18 @@ namespace Gridmap.Editor
                 // Check for palette modifications.
                 foreach(string path in paths)
                 {
+                    // Check if a GridmapPalette is being saved.
                     if(AssetDatabase.LoadAssetAtPath<GridmapPaletteData>(path) != null)
                     {
                         GameObject paletteGo = AssetDatabase.LoadAssetAtPath<GameObject>(path);
                         GridmapPalette palette = paletteGo.GetComponentInChildren<GridmapPalette>();
 
+                        // Get the palette instance that was modified from a stored dictionary of changed instances.
                         GridmapPalette paletteInstance = instancePrefabDict[paletteGo];
 
-                        CopyTo(paletteInstance.Mesh, palette.Mesh);
+                        Debug.Log("Instance is: " + paletteInstance);
+
+                        paletteInstance.Mesh.CopyTo(palette.Mesh);
                         paletteInstance.Mesh = palette.Mesh;
                     }
                 }
@@ -150,35 +131,5 @@ namespace Gridmap.Editor
 
 
         }
-
-        private static void CopyTo(Mesh original, Mesh target)
-        {
-            target.name = original.name;
-            target.vertices = original.vertices;
-            target.normals = original.normals;
-            target.tangents = original.tangents;
-            target.triangles = original.triangles;
-            target.bounds = original.bounds;
-            target.uv = original.uv;
-            target.uv2 = original.uv2;
-            target.uv3 = original.uv3;
-            target.uv4 = original.uv4;
-            target.uv5 = original.uv5;
-            target.uv6 = original.uv6;
-            target.uv7 = original.uv7;
-            target.uv8 = original.uv8;
-            target.colors = original.colors;
-            target.bindposes = original.bindposes;
-            target.boneWeights = original.boneWeights;
-            target.indexFormat = original.indexFormat;
-            target.indexBufferTarget = original.indexBufferTarget;
-            target.vertexBufferTarget = original.vertexBufferTarget;
-            target.subMeshCount = original.subMeshCount;
-            for(int i = 0; i < original.subMeshCount; i++)
-            {
-                target.SetSubMesh(i, original.GetSubMesh(i));
-            }
-        }
-
     }
 }
