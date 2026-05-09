@@ -83,16 +83,6 @@ namespace Gridmap
         /// <param name="editedBounds">The bounds of the changed tiles.  Unused.</param>
         public void BakeMesh(BoundsInt editedBounds)
         {
-            // Debug
-            //for (int i = 0; i < gridTiles.Length; i++)
-            //{
-            //    if (gridTiles[i] == null) { continue; }
-            //    Vector3Int cellPos = GridmapUtilities.IndexToPos(i, tilemap.cellBounds.size) + 
-            //        tilemap.cellBounds.position;
-            //    // Bake the mesh here.
-            //    Debug.Log($"Tile: {gridTiles[i]}.  Index: {i}. Position: {cellPos}");
-            //}
-
             // When a palette is baked, it creates a new mesh each time that's not saved as an asset.
             // Asset changes are stored on save.
             tilemap.CompressBounds();
@@ -100,7 +90,6 @@ namespace Gridmap
             GridTileBase[] gridTiles = tilemap.GetTilesBlock(tilemap.cellBounds).Select(x => x as GridTileBase).ToArray();
 
             Mesh = MeshHelper.BakeMesh(gridTiles, tilemap.cellBounds, this, out List<Material> materials);
-            //List<Material> materials = BakeMeshRaw();
             if (materials == null)
             {
                 materials = new List<Material>();

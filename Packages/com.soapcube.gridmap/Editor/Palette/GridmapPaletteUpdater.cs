@@ -9,7 +9,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
-using UnityEditor.Tilemaps;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -18,13 +17,9 @@ namespace Gridmap.Editor
     [InitializeOnLoad]
     public class GridmapPaletteUpdater
     {
-        #region CONSTS
-        private const string PALETTE_UNDO_NAME = "Edit Palette";
-        #endregion
-
-        private static Dictionary<int, GridmapPalette> undoPaletteDict = new Dictionary<int, GridmapPalette>();
         // Saves links between palette assets and palette instances created by the clipboard.
-        private static Dictionary<GameObject, GridmapPalette> instancePrefabDict = new Dictionary<GameObject, GridmapPalette>();
+        private readonly static Dictionary<GameObject, GridmapPalette> instancePrefabDict = 
+            new Dictionary<GameObject, GridmapPalette>();
 
         /// <summary>
         /// Subscribe to tilemap changed event.
@@ -32,25 +27,6 @@ namespace Gridmap.Editor
         static GridmapPaletteUpdater()
         {
             Tilemap.tilemapTileChanged += UpdatePaletteInstance;
-            Undo.undoRedoEvent += GridPaletteUndo;
-
-        }
-
-        /// <summary>
-        /// Rebakes the mesh of a palette instance when the palette is updated from an undo.
-        /// </summary>
-        /// <param name="info"></param>
-        private static void GridPaletteUndo(in UndoRedoInfo info)
-        {
-            if (!undoPaletteDict.ContainsKey(info.undoGroup)) { return; }
-            GridmapPalette paletteInstance = undoPaletteDict[info.undoGroup];
-            if (info.undoName == PALETTE_UNDO_NAME)
-            {
-                // Only bake the mesh itself, no changes to the palette.
-                //paletteInstance.BakeMeshRaw();
-                //EditorUtility.SetDirty(paletteInstance.Mesh);
-            }
-            
         }
 
         /// <summary>
@@ -60,15 +36,11 @@ namespace Gridmap.Editor
         /// <param name="tileChanges"> information on the tiles that were changed.</param>
         private static void UpdatePaletteInstance(Tilemap tilemap, Tilemap.SyncTile[] tileChanges)
         {
-
             if (tilemap.TryGetComponent(out GridmapPalette palette))
             {
                 BoundsInt editedBounds = 
                     GridmapUtilities.GetBoundsFromPositions(tileChanges.Select(x => x.position).ToArray());
                 palette.BakeMesh(editedBounds);
-
-                // Log the change to the palette in the undo dict using the current undo group so it can be tracked.
-                undoPaletteDict.Add(Undo.GetCurrentGroup(), palette);
 
                 // Save a link to this palette instance from the asset.
                 string path = GetPalettePath(palette);
@@ -83,8 +55,6 @@ namespace Gridmap.Editor
                 }
             }
         }
-
-
 
         /// <summary>
         /// Gets the palette asset GameObject from a palette.
@@ -113,19 +83,10 @@ namespace Gridmap.Editor
                         // Get the palette instance that was modified from a stored dictionary of changed instances.
                         GridmapPalette paletteInstance = instancePrefabDict[paletteGo];
 
-                        Debug.Log("Instance is: " + paletteInstance);
-
                         paletteInstance.Mesh.CopyTo(palette.Mesh);
                         paletteInstance.Mesh = palette.Mesh;
                     }
                 }
-
-                string debug = "Saving Assets: ";
-                foreach (string path in paths)
-                {
-                    debug += path + ", ";
-                }
-                Debug.Log(debug);
                 return paths;
             }
 
