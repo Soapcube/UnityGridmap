@@ -6,7 +6,6 @@
 //
 // Brief Description : 3D tile based system for creating 3D envirobnments from multiple mesh tiles.
 *****************************************************************************/
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -28,6 +27,10 @@ namespace Gridmap
         [SerializeReference, ShowIfNull] private Tilemap tilemap;
         #endregion
 
+        /// <summary>
+        /// Called when the Gridmap is created.
+        /// </summary>
+        /// <param name="tmap"></param>
         public void OnCreate(Tilemap tmap)
         {
 #if UNITY_EDITOR

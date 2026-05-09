@@ -60,7 +60,8 @@ namespace Gridmap.Brushes
         {
             // Get tilemap reference.  Currently, I'm assuming it goes with the tilemap component.
             if (brushTarget == null) { return; }
-            if (!brushTarget.TryGetComponent(out IGridmapEditable gridmap)) { return; }
+            IGridmapEditable gridmap = brushTarget.GetComponentInParent<IGridmapEditable>();
+            if (gridmap == null) { return; }
 
             // Loop through all filled positions
             foreach (Vector3Int pos in position.allPositionsWithin)
@@ -84,7 +85,8 @@ namespace Gridmap.Brushes
         {
             // Get tilemap reference.
             if (brushTarget == null) { return; }
-            if (!brushTarget.TryGetComponent(out IGridmapEditable gridmap)) { return; }
+            IGridmapEditable gridmap = brushTarget.GetComponentInParent<IGridmapEditable>();
+            if (gridmap == null) { return; }
 
             // Loop through all filled positions
             foreach (Vector3Int pos in position.allPositionsWithin)
@@ -115,9 +117,10 @@ namespace Gridmap.Brushes
             // Offset position based on the brushElevation since it isn't applied automatically.
             position.z += gridZ;
             if (brushTarget == null) { return; }
-            if (!brushTarget.TryGetComponent(out IGridmapEditable gridmap)) { return; }
+            IGridmapEditable gridmap = brushTarget.GetComponentInParent<IGridmapEditable>();
+            if (gridmap == null) { return; }
 
-            foreach(Vector3Int pos in position.allPositionsWithin)
+            foreach (Vector3Int pos in position.allPositionsWithin)
             {
                 Vector3Int swizzPos = GridmapUtilities.ConvertSwizzleSpace(pos, gridLayout.cellSwizzle);
                 // Add support for multiple cell picking in the future.
