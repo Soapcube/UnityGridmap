@@ -195,7 +195,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a61034461edc7054c8b6c01231043db7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: soapcube.gridmap::Gridmap.Gridmap
-  tileAnchor: {x: 0.5, y: 0.5, z: 0.5}
+  _tileAnchor: {x: 0.5, y: 0.5, z: 0.5}
   chunks:
     keys: []
     values: []
