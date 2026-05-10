@@ -21,10 +21,26 @@ namespace Gridmap
         private static readonly Vector3Int chunkSize = new(16, 16, 16);
         #endregion
 
+        [SerializeField] private Vector3 _tileAnchor = new Vector3(0.5f, 0.5f, 0.5f);
         [SerializeField] private ChunkDictionary chunks;
 
         #region Component References
         [SerializeReference, ShowIfNull] private Tilemap tilemap;
+        #endregion
+
+        #region Properties
+        public Vector3 tileAnchor 
+        { 
+            get => _tileAnchor; 
+            set 
+            { 
+                _tileAnchor = value;
+                if(tilemap != null)
+                {
+                    tilemap.tileAnchor = value;
+                }
+            } 
+        }
         #endregion
 
         /// <summary>

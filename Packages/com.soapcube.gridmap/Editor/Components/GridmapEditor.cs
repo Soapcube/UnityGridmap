@@ -8,18 +8,25 @@
 *****************************************************************************/
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 namespace Gridmap.Editor
 {
     [CustomEditor(typeof(Gridmap))]
     public class GridmapEditor : UnityEditor.Editor
     {
+        private SerializedProperty _tileAnchor;
+        private SerializedProperty chunks;
+        private SerializedProperty tilemap;
+
         /// <summary>
         /// Get SerializedProperty references.
         /// </summary>
         private void OnEnable()
         {
-            
+            _tileAnchor = serializedObject.FindProperty(nameof(_tileAnchor));
+            chunks = serializedObject.FindProperty(nameof(chunks));
+            tilemap = serializedObject.FindProperty(nameof(tilemap));
         }
 
         /// <summary>
@@ -27,7 +34,21 @@ namespace Gridmap.Editor
         /// </summary>
         public override void OnInspectorGUI()
         {
-            base.OnInspectorGUI();
+            serializedObject.Update();
+
+            EditorGUI.BeginChangeCheck();
+            EditorGUILayout.PropertyField(_tileAnchor);
+            if (EditorGUI.EndChangeCheck())
+            {
+                Tilemap tilemapObj = tilemap.objectReferenceValue as Tilemap;
+                if (tilemapObj != null)
+                {
+                    tilemapObj.tileAnchor = _tileAnchor.vector3Value;
+                }
+            }
+            
+            EditorGUILayout.PropertyField(tilemap);
+            EditorGUILayout.PropertyField(chunks);
 
             Gridmap gridmap = (Gridmap)target;
 
@@ -35,6 +56,8 @@ namespace Gridmap.Editor
             {
                 gridmap.BakeAllChunks();
             }
+
+            serializedObject.ApplyModifiedProperties();
         }
     }
 }
