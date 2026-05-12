@@ -74,10 +74,12 @@ namespace Gridmap.Brushes
                 gridmap.PlaceTileAtPoint(GetMeshTile(), swizzPos);
             }
 
+            // Increase the bounds size to bake adjacent chunks as well for rule tiles.
+            position.size += Vector3Int.one * 2;
             // Bake the mesh after all fills.
             if (gridmap is not GridmapPalette)
             {
-                gridmap.BakeMesh(position);
+                gridmap.Bake(position);
             }
         }
 
@@ -101,7 +103,7 @@ namespace Gridmap.Brushes
             // Bake the mesh after all changes have been made.
             if (gridmap is not GridmapPalette)
             {
-                gridmap.BakeMesh(position);
+                gridmap.Bake(position);
             }
         }
 

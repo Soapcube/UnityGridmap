@@ -56,14 +56,13 @@ namespace Gridmap
         //    this.chunkSize = chunkSize;
         //}
 
-        internal void Initialize(Gridmap parentMap, Vector3Int chunkPos, Vector3Int chunkSize, Vector3 localPosition, MeshFilter mFilter, MeshRenderer mRend)
+        internal void Initialize(Gridmap parentMap, Vector3Int chunkPos, Vector3Int chunkSize, MeshFilter mFilter, MeshRenderer mRend)
         {
             gameObject.hideFlags = GridmapUtilities.GRIDMAP_SUB_HIDEFLAGS;
             this.gridmap = parentMap;
             this.meshFilter = mFilter;
             this.meshRenderer = mRend;
             this.chunkPosition = chunkPos;
-            transform.localPosition = localPosition;
             //transform.localPosition = GridmapUtilities.GetChunkLocalPosition(chunkPos, chunkSize);
             //This doesn't matter but we always refer to X/Z/Y
             tilesInChunk = new GridTileBase[chunkSize.x * chunkSize.y * chunkSize.z];

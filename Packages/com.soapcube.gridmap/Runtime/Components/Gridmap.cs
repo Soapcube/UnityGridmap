@@ -121,8 +121,9 @@ namespace Gridmap
             MeshChunk chunk = chunkGo.AddComponent<MeshChunk>();
             MeshFilter mFilter = chunkGo.AddComponent<MeshFilter>();
             MeshRenderer mRend = chunkGo.AddComponent<MeshRenderer>();
-            chunk.Initialize(gridmap, chunkPosition, chunkSize, GetChunkLocalPosition(chunkPosition, chunkSize), 
+            chunk.Initialize(gridmap, chunkPosition, chunkSize, 
                 mFilter, mRend);
+            chunk.transform.localPosition = GetChunkLocalPosition(chunkPosition, chunkSize);
 
             chunks.Add(chunkPosition, chunk);
 
@@ -134,12 +135,9 @@ namespace Gridmap
         /// </summary>
         public void BakeAllChunks()
         {
-            foreach (var chunk in chunks.Values)
+            foreach (Vector3Int chunkPos in chunks.Keys)
             {
-                if (chunk != null)
-                {
-                    chunk.BakeChunk();
-                }
+                BakeChunk(chunkPos);
             }
         }
 
@@ -238,7 +236,7 @@ namespace Gridmap
         /// </summary>
         /// <param name="editedBounds">Not sure if this is necessary, but this will have info on the edited tiles so 
         /// it could be used to know what chunks to bake.</param>
-        public void BakeMesh(BoundsInt editedBounds)
+        public void Bake(BoundsInt editedBounds)
         {
             List<Vector3Int> rebakedChunks = new List<Vector3Int>();
             foreach (Vector3Int pos in editedBounds.allPositionsWithin)
@@ -260,9 +258,16 @@ namespace Gridmap
             {
                 if (chunks.ContainsKey(pos))
                 {
-                    chunks[pos].BakeChunk();
+                    BakeChunk(pos);
                 }
             }
+        }
+
+        private void BakeChunk(Vector3Int chunkPos)
+        {
+            // Also reposition chunks if needed.
+            chunks[chunkPos].transform.localPosition = GetChunkLocalPosition(chunkPos, chunkSize);
+            chunks[chunkPos].BakeChunk();
         }
 
         public GridLayout.CellSwizzle GetSwizzle()

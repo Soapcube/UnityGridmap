@@ -81,7 +81,7 @@ namespace Gridmap
         /// Bakes the mesh that renders this TilePalette.
         /// </summary>
         /// <param name="editedBounds">The bounds of the changed tiles.  Unused.</param>
-        public void BakeMesh(BoundsInt editedBounds)
+        public void Bake(BoundsInt editedBounds)
         {
             // When a palette is baked, it creates a new mesh each time that's not saved as an asset.
             // Asset changes are stored on save.
