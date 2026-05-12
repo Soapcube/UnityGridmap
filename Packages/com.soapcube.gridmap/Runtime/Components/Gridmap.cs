@@ -19,6 +19,7 @@ namespace Gridmap
         /// Size of the chunks
         /// </summary>
         private static readonly Vector3Int chunkSize = new(16, 16, 16);
+        private const float HEXAGON_Y_RATIO = 0.75f;
         #endregion
 
         [SerializeField] private Vector3 _tileAnchor = new Vector3(0.5f, 0.5f, 0.5f);
@@ -120,7 +121,8 @@ namespace Gridmap
             MeshChunk chunk = chunkGo.AddComponent<MeshChunk>();
             MeshFilter mFilter = chunkGo.AddComponent<MeshFilter>();
             MeshRenderer mRend = chunkGo.AddComponent<MeshRenderer>();
-            chunk.Initialize(gridmap, chunkPosition, chunkSize, mFilter, mRend);
+            chunk.Initialize(gridmap, chunkPosition, chunkSize, GetChunkLocalPosition(chunkPosition, chunkSize), 
+                mFilter, mRend);
 
             chunks.Add(chunkPosition, chunk);
 
@@ -139,6 +141,46 @@ namespace Gridmap
                     chunk.BakeChunk();
                 }
             }
+        }
+
+        /// <summary>
+        /// Gets the actual local position of a chunk based on it's position in chunk space.
+        /// </summary>
+        /// <param name="chunkPos">The position of the chunk in chunk space.</param>
+        /// <param name="chunkSize">The size of chunks chunk.</param>
+        /// <returns>The local position of the chunk.</returns>
+        public Vector3 GetChunkLocalPosition(Vector3Int chunkPos, Vector3Int chunkSize)
+        {
+            // Checks which direction the hexagons face for calculating offset.
+            bool CheckYIndex(int index)
+            {
+                switch(tilemap.cellSwizzle)
+                {
+                    case GridLayout.CellSwizzle.YZX: // X
+                    case GridLayout.CellSwizzle.YXZ: // X
+                        return index == 0;
+                    case GridLayout.CellSwizzle.XYZ: // Y
+                    case GridLayout.CellSwizzle.ZYX: // Y
+                        return index == 1;
+                    case GridLayout.CellSwizzle.XZY: // Z
+                    case GridLayout.CellSwizzle.ZXY: // Z
+                        return index == 2;
+                    default:
+                        return false;
+                }
+            }
+
+            Vector3 result = chunkPos;
+            for (int i = 0; i < 3; i++)
+            {
+                // Hexagon offsets the Y axis because hexagons are smaller.
+                if (tilemap.cellLayout == Tilemap.CellLayout.Hexagon && CheckYIndex(i))
+                {
+                    result[i] *= HEXAGON_Y_RATIO;
+                }
+                result[i] *= chunkSize[i] * tilemap.cellSize[i];
+            }
+            return result;
         }
         #endregion
 
@@ -166,17 +208,27 @@ namespace Gridmap
         /// </remarks>
         public Vector3 GridToCenteredPosition(Vector3Int gridPos)
         {
-            // gridPos is always the bottom-left-back corner of the cell.
-            // Uses the tileAnchor parameter of the tilemap, but we can make a custom parameter if needed.
-            Vector3 centeredPosition = gridPos;
-            for (int i = 0; i < 3; i++)
-            {
-                float cellSize = tilemap.layoutGrid.cellSize[i];
-                float startPos = gridPos[i] * cellSize;
-                centeredPosition[i] = Mathf.LerpUnclamped(startPos, startPos + cellSize, 
-                    tilemap.tileAnchor[i]) + (gridPos[i] * tilemap.layoutGrid.cellGap[i]);
+            switch (tilemap.cellLayout)
+            {                    
+                case GridLayout.CellLayout.Hexagon: // Hexagon has the center of the cell set as the position by default.
+                    Vector3Int swizzPos = GridmapUtilities.ConvertSwizzleSpace(gridPos, tilemap.cellSwizzle);
+                    Debug.Log(tilemap.CellToLocal(swizzPos));
+                    return tilemap.CellToLocal(swizzPos);
+                default:
+                    // gridPos is always the bottom-left-back corner of the cell.
+                    // Uses the tileAnchor parameter of the tilemap, but we can make a custom parameter if needed.
+                    Vector3 centeredPosition = gridPos;
+                    for (int i = 0; i < 3; i++)
+                    {
+                        float cellSize = tilemap.layoutGrid.cellSize[i];
+                        float startPos = gridPos[i] * cellSize;
+                        centeredPosition[i] = Mathf.LerpUnclamped(startPos, startPos + cellSize,
+                            tilemap.tileAnchor[i]) + (gridPos[i] * tilemap.layoutGrid.cellGap[i]);
+                    }
+                    return centeredPosition;
             }
-            return centeredPosition;
+
+            
         }
         #endregion
 
