@@ -171,6 +171,7 @@ namespace Gridmap
             }
 
             Vector3 result = chunkPos;
+            Vector3 cellSize = GridmapUtilities.ConvertSwizzleSpace(tilemap.cellSize, tilemap.cellSwizzle);
             for (int i = 0; i < 3; i++)
             {
                 // Hexagon offsets the Y axis because hexagons are smaller.
@@ -178,7 +179,7 @@ namespace Gridmap
                 {
                     result[i] *= HEXAGON_Y_RATIO;
                 }
-                result[i] *= chunkSize[i] * tilemap.cellSize[i];
+                result[i] *= chunkSize[i] * cellSize[i];
             }
             return result;
         }
@@ -211,7 +212,7 @@ namespace Gridmap
             switch (tilemap.cellLayout)
             {                    
                 case GridLayout.CellLayout.Hexagon: // Hexagon has the center of the cell set as the position by default.
-                    Vector3Int swizzPos = GridmapUtilities.ConvertSwizzleSpace(gridPos, tilemap.cellSwizzle);
+                    Vector3Int swizzPos = GridmapUtilities.ConvertSwizzleSpace(gridPos, GridLayout.CellSwizzle.XYZ, tilemap.cellSwizzle);
                     Debug.Log(tilemap.CellToLocal(swizzPos));
                     return tilemap.CellToLocal(swizzPos);
                 default:
