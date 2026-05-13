@@ -1,6 +1,6 @@
 /*****************************************************************************
 // File Name : GridmapBrushEditor.cs
-// Author : Brandon Koederitz
+// Author : Arcadia Koederitz
 // Creation Date : 12/15/2025
 // Last Modified : 12/15/2025
 //

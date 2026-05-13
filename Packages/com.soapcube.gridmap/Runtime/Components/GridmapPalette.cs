@@ -99,20 +99,30 @@ namespace Gridmap
 
         public Vector3 GridToCenteredPosition(Vector3Int gridPos)
         {
-            Vector3 centeredPosition = gridPos;
-            for (int i = 0; i < 3; i++)
+            switch (tilemap.cellLayout)
             {
-                GridLayout grid = tilemap.layoutGrid;
-                if (grid == null)
-                {
-                    grid = transform.parent.GetComponent<GridLayout>();
-                }
-                float cellSize = grid.cellSize[i];
-                float startPos = gridPos[i] * cellSize;
-                centeredPosition[i] = Mathf.LerpUnclamped(startPos, startPos + cellSize,
-                    tilemap.tileAnchor[i]) + (gridPos[i] * grid.cellGap[i]);
+                case GridLayout.CellLayout.Hexagon: // Hexagon has the center of the cell set as the position by default.
+                    Vector3Int swizzPos = GridmapUtilities.ConvertSwizzleSpace(gridPos, GridLayout.CellSwizzle.XYZ, tilemap.cellSwizzle);
+                    //Debug.Log(tilemap.CellToLocal(swizzPos));
+                    return tilemap.CellToLocal(swizzPos);
+                default:
+                    // gridPos is always the bottom-left-back corner of the cell.
+                    // Uses the tileAnchor parameter of the tilemap, but we can make a custom parameter if needed.
+                    Vector3 centeredPosition = gridPos;
+                    for (int i = 0; i < 3; i++)
+                    {
+                        GridLayout grid = tilemap.layoutGrid;
+                        if (grid == null)
+                        {
+                            grid = transform.parent.GetComponent<GridLayout>();
+                        }
+                        float cellSize = grid.cellSize[i];
+                        float startPos = gridPos[i] * cellSize;
+                        centeredPosition[i] = Mathf.LerpUnclamped(startPos, startPos + cellSize,
+                            tilemap.tileAnchor[i]) + (gridPos[i] * grid.cellGap[i]);
+                    }
+                    return centeredPosition;
             }
-            return centeredPosition;
         }
 
         public GridLayout.CellSwizzle GetSwizzle()

@@ -24,6 +24,7 @@ namespace Gridmap
             Mesh newMesh = new Mesh();
             newMesh.MarkDynamic();
             newMesh.indexFormat = IndexFormat.UInt32;
+            newMesh.name = name;
             return newMesh;
         }
 
@@ -180,6 +181,8 @@ namespace Gridmap
         /// <param name="target">The target mesh to copy data to.</param>
         public static void CopyTo(this Mesh original, Mesh target, bool copyName = false)
         {
+            target.Clear();
+
             if (copyName)
             {
                 target.name = original.name;

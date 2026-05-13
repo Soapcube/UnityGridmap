@@ -1,6 +1,6 @@
 /*****************************************************************************
 // File Name : ReadOnlyEditor.cs
-// Author : Brandon Koederitz
+// Author : Arcadia Koederitz
 // Creation Date : 10/25/2025
 // Last Modified : 10/25/2025
 //

@@ -1,6 +1,6 @@
 /*****************************************************************************
 // File Name : GridmapNameUpdater.cs
-// Author : Brandon Koederitz
+// Author : Arcadia Koederitz
 // Creation Date : 4/20/2025
 // Last Modified : 4/20/2025
 //
