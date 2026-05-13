@@ -211,7 +211,7 @@ namespace Gridmap
             {                    
                 case GridLayout.CellLayout.Hexagon: // Hexagon has the center of the cell set as the position by default.
                     Vector3Int swizzPos = GridmapUtilities.ConvertSwizzleSpace(gridPos, GridLayout.CellSwizzle.XYZ, tilemap.cellSwizzle);
-                    Debug.Log(tilemap.CellToLocal(swizzPos));
+                    //Debug.Log(tilemap.CellToLocal(swizzPos));
                     return tilemap.CellToLocal(swizzPos);
                 default:
                     // gridPos is always the bottom-left-back corner of the cell.

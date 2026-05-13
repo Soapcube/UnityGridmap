@@ -19,10 +19,18 @@ namespace Gridmap
     /// </summary>
     public static class MeshHelper 
     {
+        public static Mesh NewGridMesh(string name = "")
+        {
+            Mesh newMesh = new Mesh();
+            newMesh.MarkDynamic();
+            newMesh.indexFormat = IndexFormat.UInt32;
+            return newMesh;
+        }
+
         public static Mesh BakeMesh(GridTileBase[] tilesInChunk, BoundsInt meshBounds, IGridmapEditable gridmap,
             out List<Material> returnedMaterials)
         {
-            Mesh bakeTarget = new Mesh();
+            Mesh bakeTarget = NewGridMesh();
             BakeMesh(bakeTarget, tilesInChunk, meshBounds, gridmap, out returnedMaterials);
             return bakeTarget;
         }
@@ -102,7 +110,7 @@ namespace Gridmap
             List<CombineInstance> finalInstance = new();
             foreach (List<CombineInstance> instance in instances.Values)
             {
-                Mesh newInstance = new();
+                Mesh newInstance = NewGridMesh();
                 newInstance.CombineMeshes(instance.ToArray(), true);
 
                 CombineInstance nextInstance = new()

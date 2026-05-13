@@ -59,9 +59,7 @@ namespace Gridmap.Editor
             string name = Path.GetFileNameWithoutExtension(pathName);
 
             // Create the mesh that renders the grid palette.
-            Mesh paletteMesh = new Mesh();
-            paletteMesh.MarkDynamic();
-            paletteMesh.name = name + " Mesh";
+            Mesh paletteMesh = MeshHelper.NewGridMesh(name + " Mesh");
 
             // Create the SO that configures palette settings.
             GridmapPaletteData palette = CreatePaletteSettings();
