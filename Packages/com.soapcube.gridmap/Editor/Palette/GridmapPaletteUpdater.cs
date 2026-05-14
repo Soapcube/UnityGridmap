@@ -40,7 +40,7 @@ namespace Gridmap.Editor
             {
                 BoundsInt editedBounds = 
                     GridmapUtilities.GetBoundsFromPositions(tileChanges.Select(x => x.position).ToArray());
-                palette.BakeMesh(editedBounds);
+                palette.Bake(editedBounds);
 
                 // Save a link to this palette instance from the asset.
                 string path = GetPalettePath(palette);

@@ -19,7 +19,7 @@ namespace Gridmap
     {
         [SerializeField, ShowIfNull] private MeshFilter meshFilter;
         [SerializeField, ShowIfNull] private Gridmap gridmap;
-        [SerializeField, ReadOnly] private Vector3Int position;
+        [SerializeField, ReadOnly] private Vector3Int chunkPosition;
         [SerializeField, ReadOnly] private int tileNum;
 
         [SerializeField, HideInInspector] private GridTileBase[] tilesInChunk;
@@ -32,12 +32,12 @@ namespace Gridmap
         [SerializeField, ShowIfNull] private MeshRenderer meshRenderer;
 
 
-        private Mesh mesh;
+        [SerializeField] private Mesh mesh;
 
         /// <summary>
         /// Position of the Mesh Chunk
         /// </summary>
-        public Vector3Int Position { get => position; set => position = value; }
+        public Vector3Int Position { get => chunkPosition; set => chunkPosition = value; }
         public Mesh Mesh { get => mesh; }
 
         public GridTileBase[] TilesInChunk { get => tilesInChunk; set => tilesInChunk = value; }
@@ -45,7 +45,7 @@ namespace Gridmap
         /// <summary>
         /// Create a new MeshChunk
         /// </summary>
-        /// <param name="position">Position of the Chunk, also the position of index 0</param>
+        /// <param name="chunkPos">Position of the Chunk, also the position of index 0</param>
         /// <param name="chunkSize">Size of the chunk, constant for all chunks. All values must be greater than 0</param>
         //public MeshChunk(Vector3Int position, Vector3Int chunkSize)
         //{
@@ -56,18 +56,19 @@ namespace Gridmap
         //    this.chunkSize = chunkSize;
         //}
 
-        internal void Initialize(Gridmap parentMap, Vector3Int position, Vector3Int chunkSize, MeshFilter mFilter, MeshRenderer mRend)
+        internal void Initialize(Gridmap parentMap, Vector3Int chunkPos, Vector3Int chunkSize, MeshFilter mFilter, MeshRenderer mRend)
         {
             gameObject.hideFlags = GridmapUtilities.GRIDMAP_SUB_HIDEFLAGS;
             this.gridmap = parentMap;
             this.meshFilter = mFilter;
             this.meshRenderer = mRend;
-            this.position = position;
-            transform.localPosition = GridmapUtilities.GetChunkLocalPosition(position, chunkSize);
+            this.chunkPosition = chunkPos;
+            //transform.localPosition = GridmapUtilities.GetChunkLocalPosition(chunkPos, chunkSize);
             //This doesn't matter but we always refer to X/Z/Y
             tilesInChunk = new GridTileBase[chunkSize.x * chunkSize.y * chunkSize.z];
             this.chunkSize = chunkSize;
-            mesh = new Mesh();
+            mesh = MeshHelper.NewGridMesh(name + " Mesh");
+            meshFilter.sharedMesh = mesh;
         }
 
         internal bool IsEmpty()
@@ -117,10 +118,9 @@ namespace Gridmap
         /// </summary>
         public void BakeChunk()
         {
-            mesh = MeshHelper.BakeMesh(tilesInChunk, new BoundsInt(Vector3Int.zero, chunkSize), gridmap, 
+            MeshHelper.BakeMesh(mesh, tilesInChunk, new BoundsInt(Vector3Int.zero, chunkSize), gridmap, 
                 out List<Material> materials);
             meshRenderer.SetMaterials(materials);
-            meshFilter.sharedMesh = mesh;
         }
     }
 }

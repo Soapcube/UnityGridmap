@@ -10,6 +10,7 @@ using Codice.Client.Common;
 using NUnit.Framework.Constraints;
 using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 namespace Gridmap
 {
@@ -180,21 +181,6 @@ namespace Gridmap
             {
                 float thingToFloor = gridPos[i] / (float)chunkSize[i];
                 chunkPos[i] = Mathf.FloorToInt(thingToFloor);
-            }
-            return chunkPos;
-        }
-
-        /// <summary>
-        /// Gets the actual local position of a chunk based on it's position in chunk space.
-        /// </summary>
-        /// <param name="chunkPos">The position of the chunk in chunk space.</param>
-        /// <param name="chunkSize">The size of chunks chunk.</param>
-        /// <returns>The local position of the chunk.</returns>
-        public static Vector3 GetChunkLocalPosition(Vector3Int chunkPos, Vector3Int chunkSize)
-        {
-            for(int i = 0; i < 3; i++)
-            {
-                chunkPos[i] *= chunkSize[i];
             }
             return chunkPos;
         }

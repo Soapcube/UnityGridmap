@@ -19,10 +19,19 @@ namespace Gridmap
     /// </summary>
     public static class MeshHelper 
     {
+        public static Mesh NewGridMesh(string name = "")
+        {
+            Mesh newMesh = new Mesh();
+            newMesh.MarkDynamic();
+            newMesh.indexFormat = IndexFormat.UInt32;
+            newMesh.name = name;
+            return newMesh;
+        }
+
         public static Mesh BakeMesh(GridTileBase[] tilesInChunk, BoundsInt meshBounds, IGridmapEditable gridmap,
             out List<Material> returnedMaterials)
         {
-            Mesh bakeTarget = new Mesh();
+            Mesh bakeTarget = NewGridMesh();
             BakeMesh(bakeTarget, tilesInChunk, meshBounds, gridmap, out returnedMaterials);
             return bakeTarget;
         }
@@ -102,7 +111,7 @@ namespace Gridmap
             List<CombineInstance> finalInstance = new();
             foreach (List<CombineInstance> instance in instances.Values)
             {
-                Mesh newInstance = new();
+                Mesh newInstance = NewGridMesh();
                 newInstance.CombineMeshes(instance.ToArray(), true);
 
                 CombineInstance nextInstance = new()
@@ -172,6 +181,8 @@ namespace Gridmap
         /// <param name="target">The target mesh to copy data to.</param>
         public static void CopyTo(this Mesh original, Mesh target, bool copyName = false)
         {
+            target.Clear();
+
             if (copyName)
             {
                 target.name = original.name;

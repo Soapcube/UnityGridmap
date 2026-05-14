@@ -1,6 +1,6 @@
 /*****************************************************************************
 // File Name : GridmapShortcuts.cs
-// Author : Brandon Koederitz
+// Author : Arcadia Koederitz
 // Creation Date : 4/12/2025
 // Last Modified : 4/12/2025
 //

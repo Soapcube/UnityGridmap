@@ -32,9 +32,7 @@ namespace Gridmap.Brushes.Editor
                 {
                     GameObject gameObject;
                     return (gameObject = x.gameObject).scene.isLoaded
-                           && gameObject.activeInHierarchy
-                           && !gameObject.hideFlags.HasFlag(HideFlags.NotEditable)
-                           && gameObject.TryGetComponent(out Gridmap gmap);
+                           && gameObject.activeInHierarchy;
                 }).Select(x => x.gameObject).ToArray();
             }
         }

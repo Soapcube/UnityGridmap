@@ -34,18 +34,34 @@ namespace Gridmap.Editor
         {
             public override void Action(int instanceId, string pathName, string resourceFile)
             {
-                Object o = CreatePalettePrefab(pathName, resourceFile, GridLayout.CellLayout.Rectangle, Vector3.one);
+                Object o = CreatePalettePrefab(pathName, resourceFile, GridLayout.CellLayout.Rectangle, Vector3.one, GridmapEditorUtility.RECT_ANCHOR);
+                ProjectWindowUtil.ShowCreatedAsset(o);
+            }
+        }
+
+        public class DoCreateHexagonalPaletteFile : UnityEditor.ProjectWindowCallback.EndNameEditAction
+        {
+            public override void Action(int instanceId, string pathName, string resourceFile)
+            {
+                Object o = CreatePalettePrefab(pathName, resourceFile, GridLayout.CellLayout.Hexagon, GridmapEditorUtility.HEX_GRID_SIZE, Vector3.zero);
                 ProjectWindowUtil.ShowCreatedAsset(o);
             }
         }
         #endregion
 
-        [MenuItem("Assets/Create/Gridmap/Gridmap Palette")]
-        public static void CreateGridmapPalette()
+        [MenuItem("Assets/Create/Gridmap/Gridmap Palette/Rectangular", false, (int)GridmapEditorUtility.GridmapCreatePriority.Rectangular)]
+        public static void CreateGridmapPaletteRect()
         {
             //Utilized built-in project window utilities to create the GridPalette object.
             ProjectWindowUtil.StartNameEditingIfProjectWindowExists(0, 
                 ScriptableObject.CreateInstance<DoCreateRectangularPaletteFile>(), GRIDPALETTE_PATH, prefabIcon, TEMPLATE_PATH);
+        }
+        [MenuItem("Assets/Create/Gridmap/Gridmap Palette/Hexagonal", false, (int)GridmapEditorUtility.GridmapCreatePriority.Hexagonal)]
+        public static void CreateGridmapPaletteHex()
+        {
+            //Utilized built-in project window utilities to create the GridPalette object.
+            ProjectWindowUtil.StartNameEditingIfProjectWindowExists(0,
+                ScriptableObject.CreateInstance<DoCreateHexagonalPaletteFile>(), GRIDPALETTE_PATH, prefabIcon, TEMPLATE_PATH);
         }
 
         /// <summary>
@@ -54,20 +70,18 @@ namespace Gridmap.Editor
         /// <param name="pathName">The path where the palette will be saved. (Automatically made unique)</param>
         /// <returns>The palette prefab created.</returns>
         internal static Object CreatePalettePrefab(string pathName, string templatePath, 
-            GridLayout.CellLayout layout, Vector3 cellSize)
+            GridLayout.CellLayout layout, Vector3 cellSize, Vector3 anchor)
         {
             string name = Path.GetFileNameWithoutExtension(pathName);
 
             // Create the mesh that renders the grid palette.
-            Mesh paletteMesh = new Mesh();
-            paletteMesh.MarkDynamic();
-            paletteMesh.name = name + " Mesh";
+            Mesh paletteMesh = MeshHelper.NewGridMesh(name + " Mesh");
 
             // Create the SO that configures palette settings.
             GridmapPaletteData palette = CreatePaletteSettings();
 
             // Create the GridPalette prefab.
-            GameObject tempGo = CreatePaletteGameObject(name, layout, cellSize, paletteMesh, new Vector3(0.5f, 0.5f, 0.5f), palette);
+            GameObject tempGo = CreatePaletteGameObject(name, layout, cellSize, paletteMesh, anchor, palette);
             GameObject prefab = PrefabUtility.SaveAsPrefabAssetAndConnect(tempGo, pathName, 
                 InteractionMode.AutomatedAction);
 
@@ -107,9 +121,6 @@ namespace Gridmap.Editor
             grid.cellSwizzle = GridLayout.CellSwizzle.XYZ; // Always use XYZ swizzle.
             Tilemap layer = CreatePaletteLayer(tempGo, DEFAULT_LAYER_NAME, layout, paletteMesh, tileAnchor, palette);
 
-            // Configure GridMap specific components.
-
-
             return tempGo;
         }
 
@@ -129,14 +140,6 @@ namespace Gridmap.Editor
             layerGo.transform.parent = palette.transform;
             layerGo.layer = palette.layer;
             tilemap.tileAnchor = tileAnchor;
-
-            // Set defaults for certain layouts.
-            switch (layout)
-            {
-                case GridLayout.CellLayout.Hexagon:
-                    tilemap.tileAnchor = Vector3.zero;
-                    break;
-            }
 
             // Configure Gridmap Specific Components.
             MeshFilter meshFilter = layerGo.AddComponent<MeshFilter>();
@@ -165,41 +168,5 @@ namespace Gridmap.Editor
 
             return paletteSo;
         }
-
-        private static void SetHideFlagsRecursively(GameObject root, HideFlags flags)
-        {
-            root.hideFlags = flags;
-            for (int i = 0; i < root.transform.childCount; i++)
-                SetHideFlagsRecursively(root.transform.GetChild(i).gameObject, flags);
-        }
-
-        #region Mesh Management
-        /// <summary>
-        /// Creates a mesh asset in the project's assets folder to save the baked mesh data.
-        /// </summary>
-        /// <param name="gridmapName"> The name to use to identify the meshes associated with a given gridmap.</param>
-        /// <param name="targetChunk">The chunk that this mesh will belong to.</param>
-        /// <param name="createdMesh">The created mesh.</param>
-        /// <param name="meshPath">The path in the assets folder that the mesh was saved to.</param>
-        /// <param name="subdirectory">An optional subdirectory specifier for organization.</param>
-        //internal static void CreateMeshAsset(string gridmapName, MeshChunk targetChunk,
-        //    out Mesh createdMesh, out string meshPath, string subdirectory = "Scenes/GridmapMeshes")
-        //{
-        //    Mesh mesh = new Mesh();
-        //    mesh.MarkDynamic();
-
-        //    // Store the mesh files in a subfolder with the gridmap's name (just the scene name probably).
-        //    subdirectory = System.IO.Path.Join(subdirectory, gridmapName);
-        //    string filePath = System.IO.Path.Join(ASSET_FOLDER, subdirectory, gridmapName +
-        //        targetChunk.Position.ToString() + MESH_FILE_EXTENSION);
-
-        //    // Assign out variables.
-        //    meshPath = filePath;
-        //    createdMesh = mesh;
-
-        //    UnityEditor.AssetDatabase.CreateAsset(mesh, filePath);
-        //}
-
-        #endregion
     }
 }

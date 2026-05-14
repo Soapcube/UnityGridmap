@@ -1,6 +1,6 @@
 /*****************************************************************************
 // File Name : GridmapEditor.cs
-// Author : Brandon Koederitz
+// Author : Arcadia Koederitz
 // Creation Date : 3/30/2025
 // Last Modified : 3/30/2025
 //
@@ -15,6 +15,9 @@ namespace Gridmap.Editor
     [CustomEditor(typeof(Gridmap))]
     public class GridmapEditor : UnityEditor.Editor
     {
+        private const string BAKE_ALL_MESSAGE = "Bake All Chunks";
+
+
         private SerializedProperty _tileAnchor;
         private SerializedProperty chunks;
         private SerializedProperty tilemap;
@@ -52,8 +55,9 @@ namespace Gridmap.Editor
 
             Gridmap gridmap = (Gridmap)target;
 
-            if (GUILayout.Button("Bake All Chunks"))
+            if (GUILayout.Button(BAKE_ALL_MESSAGE))
             {
+                GridmapUndoUtility.RegisterGridmapUndo(gridmap, BAKE_ALL_MESSAGE);
                 gridmap.BakeAllChunks();
             }
 

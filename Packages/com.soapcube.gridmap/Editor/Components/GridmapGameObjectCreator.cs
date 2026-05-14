@@ -1,6 +1,6 @@
 /*****************************************************************************
 // File Name : GridmapEditorUtilities.cs
-// Author : Brandon Koederitz
+// Author : Arcadia Koederitz
 // Creation Date : 4/20/2025
 // Last Modified : 4/20/2025
 //
@@ -18,49 +18,97 @@ namespace Gridmap.Editor
     public static class GridmapGameObjectCreator
     {
         #region Consts
-        private const string GRIDMAP_UNDO_MESSAGE = "Create Gridmap";
+        internal static bool showDialog = true;
         #endregion
 
-        #region Gridmap Creation
-        [MenuItem("GameObject/Gridmap/Gridmap", false, 15)]
-        private static void CreateGridmap()
+        private static class Styles
         {
-            CreateGridmapInternal();
+            internal const string RECT_UNDO_MESSAGE = "Create Rectangular Gridmap";
+            internal const string HEX_UNDO_MESSAGE = "Create Hexagonal Gridmap";
+
+            internal const string MODIFY_EXISTING_GRID_TITLE = "Modify existing Grid";
+            internal const string MODIFY_EXISTING_GRID_MESSAGE = "Creating the Gridmap will modify the existing grid.  Continue?";
+            internal const string MODIFY_EXISTING_CONTINUE = "Continue";
+            internal const string MODIFY_EXISTING_CANCEL = "Cancel";
         }
 
-        private static GameObject CreateGridmapInternal()
+
+        #region Gridmap Creation
+        [MenuItem("GameObject/Gridmap/Rectangular", false, (int)GridmapEditorUtility.GridmapCreatePriority.Rectangular)]
+        private static void CreateRectGridmap()
         {
-            if (!FindOrCreateRootGrid(Grid.CellLayout.Rectangle, false, GridLayout.CellSwizzle.XYZ, false, 
+            CreateRectGridmapInternal(Tilemap.CellSwizzle.XZY, Styles.RECT_UNDO_MESSAGE);
+        }
+
+        [MenuItem("GameObject/Gridmap/Hexagonal", false, (int)GridmapEditorUtility.GridmapCreatePriority.Hexagonal)]
+        private static void CreateHexGridmap()
+        {
+            CreateHexGridmapInternal(Tilemap.CellSwizzle.XZY, Styles.HEX_UNDO_MESSAGE, GridmapEditorUtility.HEX_GRID_SIZE);
+        }
+
+        private static GameObject CreateRectGridmapInternal(Tilemap.CellSwizzle swizzle, string undoMessage)
+        {
+            if (!FindOrCreateRootGrid(Grid.CellLayout.Rectangle, true, swizzle, false,
+                Vector3.one, out GameObject root))
+            {
+                return null;
+            }
+
+            GameObject gridmapGo = CreateGridmapObject(root);
+
+            // Change the grid to rectangle layout
+            Grid grid = root.GetComponent<Grid>();
+            Undo.RecordObject(grid, undoMessage);
+            grid.cellLayout = GridLayout.CellLayout.Rectangle;
+            grid.cellSwizzle = swizzle;
+
+            Gridmap gmap = gridmapGo.GetComponent<Gridmap>();
+            gmap.tileAnchor = GridmapEditorUtility.RECT_ANCHOR;
+
+            // Create painting layer.
+            Tilemap painting = CreatePaintingLayer(gmap, gridmapGo.transform, GridmapEditorUtility.RECT_ANCHOR);
+
+            Selection.activeObject = gridmapGo;
+            Undo.SetCurrentGroupName(undoMessage);
+            return gridmapGo;
+        }
+
+        private static GameObject CreateHexGridmapInternal(Tilemap.CellSwizzle swizzle, string undoMessage, Vector3 cellSize)
+        {
+            if (!FindOrCreateRootGrid(Grid.CellLayout.Rectangle, false, swizzle, false,
                 Vector3.one, out GameObject root))
             {
                 return null;
             }
 
             //Create the Gridmap GameObject
-            string uniqueName = GameObjectUtility.GetUniqueNameForSibling(root.transform, "Gridmap");
-            GameObject gridmapGo = ObjectFactory.CreateGameObject(uniqueName, typeof(Gridmap)); // TODO: Add components by types.
-            Undo.SetTransformParent(gridmapGo.transform, root.transform, ""); // Register with Undo.
-            gridmapGo.transform.position = Vector3.zero;
+            GameObject gridmapGo = CreateGridmapObject(root);
 
-            // Change the grid to rectangle layout
+            // Change the grid to hex layout.
             Grid grid = root.GetComponent<Grid>();
-            if (grid.cellLayout != GridLayout.CellLayout.Rectangle)
-            {
-                Undo.RecordObject(grid, GRIDMAP_UNDO_MESSAGE);
-                grid.cellLayout = GridLayout.CellLayout.Rectangle;
-            }
+            Undo.RecordObject(grid, undoMessage);
+            grid.cellLayout = GridLayout.CellLayout.Hexagon;
+            grid.cellSwizzle = swizzle;
+            grid.cellSize = cellSize;
 
             Gridmap gmap = gridmapGo.GetComponent<Gridmap>();
+            gmap.tileAnchor = Vector3.zero;
 
             // Create painting layer.
-            Tilemap painting = CreatePaintingLayer(gmap, gridmapGo.transform, new Vector3(0.5f, 0.5f, 0.5f));
-
-            // Setup Components
-            Undo.RecordObject(gmap, "Assign Gridmap Components");
-            gmap.OnCreate(painting);
+            Tilemap painting = CreatePaintingLayer(gmap, gridmapGo.transform, Vector3.zero); 
 
             Selection.activeObject = gridmapGo;
-            Undo.SetCurrentGroupName(GRIDMAP_UNDO_MESSAGE);
+            Undo.SetCurrentGroupName(undoMessage);
+            return gridmapGo;
+        }
+
+        private static GameObject CreateGridmapObject(GameObject root)
+        {
+            //Create the Gridmap GameObject
+            string uniqueName = GameObjectUtility.GetUniqueNameForSibling(root.transform, "Gridmap");
+            GameObject gridmapGo = ObjectFactory.CreateGameObject(uniqueName, typeof(Gridmap));
+            Undo.SetTransformParent(gridmapGo.transform, root.transform, ""); // Register with Undo.
+            gridmapGo.transform.position = Vector3.zero;
             return gridmapGo;
         }
 
@@ -83,6 +131,10 @@ namespace Gridmap.Editor
             Tilemap tmap = paintGo.GetComponent<Tilemap>();
             tmap.tileAnchor = anchor;
             Undo.RegisterCompleteObjectUndo(paintGo, "Create Painter");
+
+            // Setup Components
+            Undo.RecordObject(gmap, "Assign Gridmap Components");
+            gmap.OnCreate(tmap);
 
             return tmap;
         }
@@ -107,7 +159,21 @@ namespace Gridmap.Editor
                 Grid parentGrid = go.GetComponentInParent<Grid>();
                 if ( parentGrid != null)
                 {
-                    // Add editor dialogue for modifying an existing grid here.
+                    // Displays a dialogue popup that notifies the user the grid will be auto-updated.
+                    if (showDialog
+                        && !Application.isBatchMode
+                        && (parentGrid.cellLayout != layout // Checks for incongruence.
+                            || (changeSwizzle && parentGrid.cellSwizzle != swizzle)
+                            || (changeSize && Vector3.Distance(parentGrid.cellSize, size) > 0.001f)))
+                    {
+                        var option = EditorUtility.DisplayDialog(Styles.MODIFY_EXISTING_GRID_TITLE
+                            , Styles.MODIFY_EXISTING_GRID_MESSAGE
+                            , Styles.MODIFY_EXISTING_CONTINUE
+                            , Styles.MODIFY_EXISTING_CANCEL);
+                        if (!option)
+                            return false;
+                    }
+
                     root = parentGrid.gameObject;
                 }
             }
