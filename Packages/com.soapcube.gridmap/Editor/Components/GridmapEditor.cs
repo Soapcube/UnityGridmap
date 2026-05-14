@@ -57,7 +57,7 @@ namespace Gridmap.Editor
 
             if (GUILayout.Button(BAKE_ALL_MESSAGE))
             {
-                Undo.RegisterFullObjectHierarchyUndo(gridmap.gameObject, BAKE_ALL_MESSAGE);
+                GridmapUndoUtility.RegisterGridmapUndo(gridmap, BAKE_ALL_MESSAGE);
                 gridmap.BakeAllChunks();
             }
 

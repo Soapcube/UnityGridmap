@@ -32,7 +32,7 @@ namespace Gridmap
         [SerializeField, ShowIfNull] private MeshRenderer meshRenderer;
 
 
-        private Mesh mesh;
+        [SerializeField] private Mesh mesh;
 
         /// <summary>
         /// Position of the Mesh Chunk
@@ -67,7 +67,8 @@ namespace Gridmap
             //This doesn't matter but we always refer to X/Z/Y
             tilesInChunk = new GridTileBase[chunkSize.x * chunkSize.y * chunkSize.z];
             this.chunkSize = chunkSize;
-            mesh = new Mesh();
+            mesh = MeshHelper.NewGridMesh(name + " Mesh");
+            meshFilter.sharedMesh = mesh;
         }
 
         internal bool IsEmpty()
@@ -117,10 +118,9 @@ namespace Gridmap
         /// </summary>
         public void BakeChunk()
         {
-            mesh = MeshHelper.BakeMesh(tilesInChunk, new BoundsInt(Vector3Int.zero, chunkSize), gridmap, 
+            MeshHelper.BakeMesh(mesh, tilesInChunk, new BoundsInt(Vector3Int.zero, chunkSize), gridmap, 
                 out List<Material> materials);
             meshRenderer.SetMaterials(materials);
-            meshFilter.sharedMesh = mesh;
         }
     }
 }

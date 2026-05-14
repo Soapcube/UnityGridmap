@@ -6,6 +6,7 @@
 //
 // Brief Description : Base editor for the Gridmap brush.
 *****************************************************************************/
+using Gridmap.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -26,22 +27,16 @@ namespace Gridmap.Brushes.Editor
                 IGridmapEditable editable = brushTarget.GetComponentInParent<IGridmapEditable>();
                 if (editable == null) { return; }
                 {
-                    switch(editable)
+                    switch (editable)
                     {
                         case Gridmap gridmap:
-                            RegisterGridmapUndo(gridmap, tool.ToString());
+                            GridmapUndoUtility.RegisterGridmapUndo(gridmap, tool.ToString());
                             break;
                         default:
                             break;
                     }
                 }
             }
-        }
-
-
-        private void RegisterGridmapUndo(Gridmap gmap, string undoMessage)
-        {
-            Undo.RegisterFullObjectHierarchyUndo(gmap.gameObject, undoMessage);
         }
         #region Undo Handling
 
