@@ -10,9 +10,12 @@ using UnityEngine;
 
 namespace Gridmap
 {
+    [Icon(ICON_PATH)]
     [CreateAssetMenu(fileName = "MeshTile", menuName = "Gridmap/Tiles/Mesh Tile")]
     public class MeshTile : GridTileBase
     {
+        private const string ICON_PATH = "Packages/com.soapcube.gridmap/Editor/EditorDefaultResources/Icons/d_MeshTile@64.png";
+
         [SerializeField] private Mesh mesh;
         [SerializeField] private Vector3 offset;
         [SerializeField] private Material[] materials;
