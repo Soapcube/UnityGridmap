@@ -12,6 +12,7 @@ using UnityEngine.Tilemaps;
 
 namespace Gridmap
 {
+    [Icon(ICON_PATH)]
     public class Gridmap : MonoBehaviour, IGridmapEditable
     {
         #region CONSTS
@@ -20,6 +21,7 @@ namespace Gridmap
         /// </summary>
         private static readonly Vector3Int chunkSize = new(16, 16, 16);
         private const float HEXAGON_Y_RATIO = 0.75f;
+        private const string ICON_PATH = "Packages/com.soapcube.gridmap/Editor/Icons/d_Gridmap@64.png";
         #endregion
 
         [SerializeField] private Vector3 _tileAnchor = new Vector3(0.5f, 0.5f, 0.5f);

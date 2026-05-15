@@ -9,6 +9,7 @@
 using Gridmap.Editor;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 namespace Gridmap.Brushes.Editor
 {
@@ -38,8 +39,12 @@ namespace Gridmap.Brushes.Editor
                 }
             }
         }
-        #region Undo Handling
 
-        #endregion
+        public override void OnPaintSceneGUI(GridLayout gridLayout, GameObject brushTarget, BoundsInt position, 
+            GridBrushBase.Tool tool, bool executing)
+        {
+            Tilemap tmap = brushTarget.GetComponentInParent<Tilemap>();
+            
+        }
     }
 }
