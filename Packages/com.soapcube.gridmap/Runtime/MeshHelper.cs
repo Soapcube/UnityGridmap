@@ -57,6 +57,8 @@ namespace Gridmap
 
                 Vector3 offset = gridmap.GridToCenteredPosition(GridmapUtilities.IndexToPos(i, meshBounds.size)
                     + meshBounds.position) + tilesInChunk[i].Offset;
+                Vector3 rotation = tilesInChunk[i].Rotation;
+                Vector3 scale = tilesInChunk[i].Scale;
                 Material[] materials = tilesInChunk[i].GetMaterials();
                 foreach (Material material in materials)
                 {
@@ -82,7 +84,7 @@ namespace Gridmap
                     CombineInstance newInstance = new()
                     {
                         mesh = tileMesh,
-                        transform = Matrix4x4.Translate(offset),
+                        transform = Matrix4x4.TRS(offset, Quaternion.Euler(rotation), scale) //Matrix4x4.Translate(offset)
                     };
 
                     instances[materials[0]].Add(newInstance);
@@ -95,7 +97,7 @@ namespace Gridmap
                         CombineInstance newInstance = new()
                         {
                             mesh = submesh,
-                            transform = Matrix4x4.Translate(offset),
+                            transform = Matrix4x4.TRS(offset, Quaternion.Euler(rotation), scale) //Matrix4x4.Translate(offset),
                         };
 
                         instances[materials[j]].Add(newInstance);

@@ -16,9 +16,13 @@ namespace Gridmap
     {
         private const string ICON_PATH = "Packages/com.soapcube.gridmap/Editor/Icons/d_MeshTile@64.png";
 
+        [Header("Mesh")]
         [SerializeField] private Mesh mesh;
-        [SerializeField] private Vector3 offset;
         [SerializeField] private Material[] materials;
+        [Header("Transform")]
+        [SerializeField] private Vector3 offset;
+        [SerializeField] private Vector3 rotation;
+        [SerializeField] private Vector3 scale = Vector3.one;
 
 
         #region Properties
@@ -27,6 +31,9 @@ namespace Gridmap
         #endregion
 
         internal override Vector3 Offset => offset;
+        public override Vector3 Rotation => rotation;
+        public override Vector3 Scale => scale;
+
 
         /// <summary>
         /// return specific mesh for testing.
