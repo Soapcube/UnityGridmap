@@ -89,6 +89,8 @@ namespace Gridmap
 
             GridTileBase[] gridTiles = tilemap.GetTilesBlock(tilemap.cellBounds).Select(x => x as GridTileBase).ToArray();
 
+            Vector3 paletteRotation = Vector3.zero;
+
             Mesh = MeshHelper.BakeMesh(gridTiles, tilemap.cellBounds, this, out List<Material> materials);
             if (materials == null)
             {
