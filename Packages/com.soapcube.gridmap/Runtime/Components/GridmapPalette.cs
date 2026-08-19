@@ -23,6 +23,7 @@ namespace Gridmap
         [SerializeField, ReadOnly] private Tilemap tilemap;
         [SerializeField, ReadOnly] private Mesh mesh;
         [SerializeField, ReadOnly] private ScriptableObject paletteData;
+        [SerializeField] private Vector3 paletteRotation = new Vector3(-90, 0, 0);
 
         #region Properties
         public Mesh Mesh
@@ -89,9 +90,15 @@ namespace Gridmap
 
             GridTileBase[] gridTiles = tilemap.GetTilesBlock(tilemap.cellBounds).Select(x => x as GridTileBase).ToArray();
 
-            Vector3 paletteRotation = Vector3.zero;
+            MeshHelper.MeshTransform ApplyPaletteRotation(GridTileBase tile, int index, MeshHelper.MeshTransform baseTransform)
+            {
+                Quaternion paletteRot = Quaternion.Euler(paletteRotation);
+                baseTransform.offset = Quaternion.Inverse(paletteRot) * baseTransform.offset;
+                baseTransform.rotation = paletteRot * baseTransform.rotation;
+                return baseTransform;
+            }
 
-            Mesh = MeshHelper.BakeMesh(gridTiles, tilemap.cellBounds, this, out List<Material> materials);
+            Mesh = MeshHelper.BakeMesh(gridTiles, tilemap.cellBounds, this, out List<Material> materials, ApplyPaletteRotation);
             if (materials == null)
             {
                 materials = new List<Material>();

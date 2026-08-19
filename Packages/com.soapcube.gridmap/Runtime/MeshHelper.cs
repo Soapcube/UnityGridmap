@@ -17,8 +17,18 @@ namespace Gridmap
     /// <summary>
     /// Helper class for odd mesh-related things
     /// </summary>
+    public delegate MeshHelper.MeshTransform MeshTransformProcessor(GridTileBase tile, int index, MeshHelper.MeshTransform baseTransform);
     public static class MeshHelper 
     {
+        #region Nested
+        public struct MeshTransform
+        {
+            public Vector3 offset;
+            public Quaternion rotation;
+            public Vector3 scale;
+        }
+        #endregion
+
         public static Mesh NewGridMesh(string name = "")
         {
             Mesh newMesh = new Mesh();
@@ -29,10 +39,10 @@ namespace Gridmap
         }
 
         public static Mesh BakeMesh(GridTileBase[] tilesInChunk, BoundsInt meshBounds, IGridmapEditable gridmap,
-            out List<Material> returnedMaterials)
+            out List<Material> returnedMaterials, MeshTransformProcessor transformProcessor = null)
         {
             Mesh bakeTarget = NewGridMesh();
-            BakeMesh(bakeTarget, tilesInChunk, meshBounds, gridmap, out returnedMaterials);
+            BakeMesh(bakeTarget, tilesInChunk, meshBounds, gridmap, out returnedMaterials, transformProcessor);
             return bakeTarget;
         }
 
@@ -41,7 +51,7 @@ namespace Gridmap
         /// </summary>
         /// <returns>The baked mesh also saves the baked mesh to the MeshChunk's Mesh property</returns>
         public static Mesh BakeMesh(Mesh masterMesh, GridTileBase[] tilesInChunk, BoundsInt meshBounds, IGridmapEditable gridmap,
-            out List<Material> returnedMaterials)
+            out List<Material> returnedMaterials, MeshTransformProcessor transformProcessor = null)
         {
             masterMesh.Clear();
             Dictionary<Material, List<CombineInstance>> instances = new();
@@ -55,10 +65,23 @@ namespace Gridmap
                     continue;
                 }
 
-                Vector3 offset = gridmap.GridToCenteredPosition(GridmapUtilities.IndexToPos(i, meshBounds.size)
-                    + meshBounds.position) + tilesInChunk[i].Offset;
-                Vector3 rotation = tilesInChunk[i].Rotation;
-                Vector3 scale = tilesInChunk[i].Scale;
+                MeshTransform transform = new MeshTransform
+                {
+                    offset = tilesInChunk[i].Offset,
+                    rotation = Quaternion.Euler(tilesInChunk[i].Rotation),
+                    scale = tilesInChunk[i].Scale
+                };
+                // Apply custom changes to the transform of each tile.
+                if (transformProcessor != null)
+                {
+                    transform = transformProcessor(tilesInChunk[i], i, transform);
+                }
+
+                // Apply the offset for the tile's position.
+                transform.offset += gridmap.GridToCenteredPosition(GridmapUtilities.IndexToPos(i, meshBounds.size)
+                    + meshBounds.position);
+
+
                 Material[] materials = tilesInChunk[i].GetMaterials();
                 foreach (Material material in materials)
                 {
@@ -84,7 +107,7 @@ namespace Gridmap
                     CombineInstance newInstance = new()
                     {
                         mesh = tileMesh,
-                        transform = Matrix4x4.TRS(offset, Quaternion.Euler(rotation), scale) //Matrix4x4.Translate(offset)
+                        transform = Matrix4x4.TRS(transform.offset, transform.rotation, transform.scale) //Matrix4x4.Translate(offset)
                     };
 
                     instances[materials[0]].Add(newInstance);
@@ -97,7 +120,7 @@ namespace Gridmap
                         CombineInstance newInstance = new()
                         {
                             mesh = submesh,
-                            transform = Matrix4x4.TRS(offset, Quaternion.Euler(rotation), scale) //Matrix4x4.Translate(offset),
+                            transform = Matrix4x4.TRS(transform.offset, transform.rotation, transform.scale) //Matrix4x4.Translate(offset),
                         };
 
                         instances[materials[j]].Add(newInstance);
