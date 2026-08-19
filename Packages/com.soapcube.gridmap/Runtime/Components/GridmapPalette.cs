@@ -42,13 +42,14 @@ namespace Gridmap
         /// Initialzies the GridPalette on creation.
         /// </summary>
         /// <param name="meshFilter"></param>
-        public void Initialize(MeshFilter meshFilter, MeshRenderer meshRenderer, Tilemap tilemap, Mesh mesh, ScriptableObject paletteData)
+        public void Initialize(MeshFilter meshFilter, MeshRenderer meshRenderer, Tilemap tilemap, Mesh mesh, ScriptableObject paletteData, Vector3 rotation)
         {
             this.meshFilter = meshFilter;
             this.meshRenderer = meshRenderer;
             this.tilemap = tilemap;
             this.mesh = mesh;
             this.paletteData = paletteData;
+            this.paletteRotation = rotation;
             mesh.MarkDynamic();
         }
 
