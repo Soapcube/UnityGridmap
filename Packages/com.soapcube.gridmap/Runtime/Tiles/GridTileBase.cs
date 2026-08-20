@@ -14,7 +14,11 @@ namespace Gridmap
 {
     public abstract class GridTileBase : TileBase
     {
+        #region Properties
         internal virtual Vector3 Offset => Vector2.zero;
+        public virtual Vector3 Rotation => Vector2.zero;
+        public virtual Vector3 Scale => Vector2.one;
+        #endregion
 
         /// <summary>
         /// Get the loop values in order to find duplicates
@@ -80,7 +84,7 @@ namespace Gridmap
         //    //    loopConnections.Add(vertexPositions, triangle.ToList());
         //    //}
 
-            
+
         //}
         /// <summary>
         /// Gets the mesh to paint on the gridmap, taking into account any vertex/face removal or rules.

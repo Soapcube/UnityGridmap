@@ -6,11 +6,7 @@
 //
 // Brief Description : Set of static helper functions and core definitions for the Gridmap system.
 *****************************************************************************/
-using Codice.Client.Common;
-using NUnit.Framework.Constraints;
-using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
 namespace Gridmap
 {

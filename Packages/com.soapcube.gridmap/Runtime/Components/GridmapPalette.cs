@@ -23,6 +23,7 @@ namespace Gridmap
         [SerializeField, ReadOnly] private Tilemap tilemap;
         [SerializeField, ReadOnly] private Mesh mesh;
         [SerializeField, ReadOnly] private ScriptableObject paletteData;
+        [SerializeField] private Vector3 paletteRotation = new Vector3(-90, 0, 0);
 
         #region Properties
         public Mesh Mesh
@@ -41,13 +42,14 @@ namespace Gridmap
         /// Initialzies the GridPalette on creation.
         /// </summary>
         /// <param name="meshFilter"></param>
-        public void Initialize(MeshFilter meshFilter, MeshRenderer meshRenderer, Tilemap tilemap, Mesh mesh, ScriptableObject paletteData)
+        public void Initialize(MeshFilter meshFilter, MeshRenderer meshRenderer, Tilemap tilemap, Mesh mesh, ScriptableObject paletteData, Vector3 rotation)
         {
             this.meshFilter = meshFilter;
             this.meshRenderer = meshRenderer;
             this.tilemap = tilemap;
             this.mesh = mesh;
             this.paletteData = paletteData;
+            this.paletteRotation = rotation;
             mesh.MarkDynamic();
         }
 
@@ -89,7 +91,15 @@ namespace Gridmap
 
             GridTileBase[] gridTiles = tilemap.GetTilesBlock(tilemap.cellBounds).Select(x => x as GridTileBase).ToArray();
 
-            Mesh = MeshHelper.BakeMesh(gridTiles, tilemap.cellBounds, this, out List<Material> materials);
+            MeshHelper.MeshTransform ApplyPaletteRotation(GridTileBase tile, int index, MeshHelper.MeshTransform baseTransform)
+            {
+                Quaternion paletteRot = Quaternion.Euler(paletteRotation);
+                baseTransform.offset = Quaternion.Inverse(paletteRot) * baseTransform.offset;
+                baseTransform.rotation = paletteRot * baseTransform.rotation;
+                return baseTransform;
+            }
+
+            Mesh = MeshHelper.BakeMesh(gridTiles, tilemap.cellBounds, this, out List<Material> materials, ApplyPaletteRotation);
             if (materials == null)
             {
                 materials = new List<Material>();

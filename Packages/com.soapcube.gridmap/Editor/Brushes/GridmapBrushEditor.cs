@@ -39,12 +39,5 @@ namespace Gridmap.Brushes.Editor
                 }
             }
         }
-
-        public override void OnPaintSceneGUI(GridLayout gridLayout, GameObject brushTarget, BoundsInt position, 
-            GridBrushBase.Tool tool, bool executing)
-        {
-            Tilemap tmap = brushTarget.GetComponentInParent<Tilemap>();
-            
-        }
     }
 }

@@ -4,7 +4,7 @@
 // Creation Date : 4/5/2025
 // Last Modified : 4/8/2025
 //
-// Brief Description : Editor script for managing GridPalettes
+// Brief Description : Editor script for managing and creating GridPalettes
 *****************************************************************************/
 using System.IO;
 using UnityEditor;
@@ -22,9 +22,6 @@ namespace Gridmap.Editor
         // Defaults
         private const string DEFAULT_LAYER_NAME = "Layer1";
         private const string DEFAULT_PALETTESO_NAME = "Palette Settings";
-
-        private const string ASSET_FOLDER = "Assets";
-        private const string MESH_FILE_EXTENSION = ".mesh";
         #endregion
 
         private static Texture2D prefabIcon = (EditorGUIUtility.IconContent("Prefab Icon").image as Texture2D);
@@ -32,37 +29,64 @@ namespace Gridmap.Editor
         #region Nested
         public class DoCreateRectangularPaletteFile : UnityEditor.ProjectWindowCallback.EndNameEditAction
         {
+            internal Vector3 rotation;
             public override void Action(int instanceId, string pathName, string resourceFile)
             {
-                Object o = CreatePalettePrefab(pathName, resourceFile, GridLayout.CellLayout.Rectangle, Vector3.one, GridmapEditorUtility.RECT_ANCHOR);
+                Object o = CreatePalettePrefab(pathName, resourceFile, GridLayout.CellLayout.Rectangle, Vector3.one, GridmapEditorUtility.RECT_ANCHOR, rotation);
                 ProjectWindowUtil.ShowCreatedAsset(o);
             }
         }
 
         public class DoCreateHexagonalPaletteFile : UnityEditor.ProjectWindowCallback.EndNameEditAction
         {
+            internal Vector3 rotation;
             public override void Action(int instanceId, string pathName, string resourceFile)
             {
-                Object o = CreatePalettePrefab(pathName, resourceFile, GridLayout.CellLayout.Hexagon, GridmapEditorUtility.HEX_GRID_SIZE, Vector3.zero);
+                Object o = CreatePalettePrefab(pathName, resourceFile, GridLayout.CellLayout.Hexagon, GridmapEditorUtility.HEX_GRID_SIZE, Vector3.zero, rotation);
                 ProjectWindowUtil.ShowCreatedAsset(o);
             }
         }
         #endregion
 
+        #region Create Functions
         [MenuItem("Assets/Create/Gridmap/Gridmap Palette/Rectangular", false, (int)GridmapEditorUtility.GridmapCreatePriority.Rectangular)]
         public static void CreateGridmapPaletteRect()
         {
+            DoCreateRectangularPaletteFile callback = ScriptableObject.CreateInstance<DoCreateRectangularPaletteFile>();
+            callback.rotation = Vector3.zero;
             //Utilized built-in project window utilities to create the GridPalette object.
             ProjectWindowUtil.StartNameEditingIfProjectWindowExists(0, 
-                ScriptableObject.CreateInstance<DoCreateRectangularPaletteFile>(), GRIDPALETTE_PATH, prefabIcon, TEMPLATE_PATH);
+                callback, GRIDPALETTE_PATH, prefabIcon, TEMPLATE_PATH);
         }
+        [MenuItem("Assets/Create/Gridmap/Gridmap Palette/Rectangular Top Down", false, (int)GridmapEditorUtility.GridmapCreatePriority.RectangularTopDown)]
+        public static void CreateGridmapPaletteRectTopDown()
+        {
+            DoCreateRectangularPaletteFile callback = ScriptableObject.CreateInstance<DoCreateRectangularPaletteFile>();
+            callback.rotation = GridmapEditorUtility.TOP_DOWN_ROTATION;
+            //Utilized built-in project window utilities to create the GridPalette object.
+            ProjectWindowUtil.StartNameEditingIfProjectWindowExists(0,
+                callback, GRIDPALETTE_PATH, prefabIcon, TEMPLATE_PATH);
+        }
+
         [MenuItem("Assets/Create/Gridmap/Gridmap Palette/Hexagonal", false, (int)GridmapEditorUtility.GridmapCreatePriority.Hexagonal)]
         public static void CreateGridmapPaletteHex()
         {
+            DoCreateHexagonalPaletteFile callback = ScriptableObject.CreateInstance<DoCreateHexagonalPaletteFile>();
+            callback.rotation = Vector3.zero;
             //Utilized built-in project window utilities to create the GridPalette object.
             ProjectWindowUtil.StartNameEditingIfProjectWindowExists(0,
-                ScriptableObject.CreateInstance<DoCreateHexagonalPaletteFile>(), GRIDPALETTE_PATH, prefabIcon, TEMPLATE_PATH);
+                callback, GRIDPALETTE_PATH, prefabIcon, TEMPLATE_PATH);
         }
+        [MenuItem("Assets/Create/Gridmap/Gridmap Palette/Hexagonal Top Down", false, (int)GridmapEditorUtility.GridmapCreatePriority.HexagonalTopDown)]
+        public static void CreateGridmapPaletteHexTopDown()
+        {
+            DoCreateHexagonalPaletteFile callback = ScriptableObject.CreateInstance<DoCreateHexagonalPaletteFile>();
+            callback.rotation = GridmapEditorUtility.TOP_DOWN_ROTATION;
+            //Utilized built-in project window utilities to create the GridPalette object.
+            ProjectWindowUtil.StartNameEditingIfProjectWindowExists(0,
+                callback, GRIDPALETTE_PATH, prefabIcon, TEMPLATE_PATH);
+        }
+        #endregion
 
         /// <summary>
         /// Creates the actual GridPalette prefab object.
@@ -70,7 +94,7 @@ namespace Gridmap.Editor
         /// <param name="pathName">The path where the palette will be saved. (Automatically made unique)</param>
         /// <returns>The palette prefab created.</returns>
         internal static Object CreatePalettePrefab(string pathName, string templatePath, 
-            GridLayout.CellLayout layout, Vector3 cellSize, Vector3 anchor)
+            GridLayout.CellLayout layout, Vector3 cellSize, Vector3 anchor, Vector3 rotation)
         {
             string name = Path.GetFileNameWithoutExtension(pathName);
 
@@ -81,7 +105,7 @@ namespace Gridmap.Editor
             GridmapPaletteData palette = CreatePaletteSettings();
 
             // Create the GridPalette prefab.
-            GameObject tempGo = CreatePaletteGameObject(name, layout, cellSize, paletteMesh, anchor, palette);
+            GameObject tempGo = CreatePaletteGameObject(name, layout, cellSize, paletteMesh, anchor, palette, rotation);
             GameObject prefab = PrefabUtility.SaveAsPrefabAssetAndConnect(tempGo, pathName, 
                 InteractionMode.AutomatedAction);
 
@@ -110,7 +134,7 @@ namespace Gridmap.Editor
         /// <param name="paletteMesh">The mesh that stores rendering information about the grid palette.</param>
         /// <returns>The created grid palette GameObject.</returns>
         internal static GameObject CreatePaletteGameObject(string name, GridLayout.CellLayout layout, Vector3 cellSize, 
-            Mesh paletteMesh, Vector3 tileAnchor, GridPalette palette)
+            Mesh paletteMesh, Vector3 tileAnchor, GridPalette palette, Vector3 rotation)
         {
             GameObject tempGo = new(name);
 
@@ -119,7 +143,7 @@ namespace Gridmap.Editor
             grid.cellSize = cellSize;
             grid.cellLayout = layout;
             grid.cellSwizzle = GridLayout.CellSwizzle.XYZ; // Always use XYZ swizzle.
-            Tilemap layer = CreatePaletteLayer(tempGo, DEFAULT_LAYER_NAME, layout, paletteMesh, tileAnchor, palette);
+            Tilemap layer = CreatePaletteLayer(tempGo, DEFAULT_LAYER_NAME, layout, paletteMesh, tileAnchor, palette, rotation);
 
             return tempGo;
         }
@@ -133,7 +157,7 @@ namespace Gridmap.Editor
         /// <param name="paletteMesh">The mesh that the layer uses to render the GridPalette.</param>
         /// <returns>The created tilemap component on the layer.</returns>
         private static Tilemap CreatePaletteLayer(GameObject palette, string layerName, GridLayout.CellLayout layout, 
-            Mesh paletteMesh, Vector3 tileAnchor, GridPalette paletteData)
+            Mesh paletteMesh, Vector3 tileAnchor, GridPalette paletteData, Vector3 rotation)
         {
             GameObject layerGo = new GameObject(layerName);
             Tilemap tilemap = layerGo.AddComponent<Tilemap>();
@@ -147,7 +171,7 @@ namespace Gridmap.Editor
             meshFilter.sharedMesh = paletteMesh;
 
             GridmapPalette gmp = layerGo.AddComponent<GridmapPalette>();
-            gmp.Initialize(meshFilter, meshRenderer, tilemap, paletteMesh, paletteData);
+            gmp.Initialize(meshFilter, meshRenderer, tilemap, paletteMesh, paletteData, rotation);
             
             return tilemap;
         }
