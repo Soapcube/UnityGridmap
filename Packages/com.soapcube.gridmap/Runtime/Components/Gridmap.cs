@@ -202,6 +202,21 @@ namespace Gridmap
         }
 
         /// <summary>
+        /// Converts a world position to a cell position in the grid.
+        /// </summary>
+        /// <param name="worldPos"></param>
+        /// <returns></returns>
+        public Vector3Int WorldToGridPosition(Vector3 worldPos)
+        {
+            // Scale the world position based on the cell size and gap.
+            for(int i = 0; i < 3; i++)
+            {
+                worldPos[i] = worldPos[i] / (tilemap.layoutGrid.cellSize[i] + tilemap.layoutGrid.cellGap[i]);
+            }
+            return tilemap.WorldToCell(worldPos);
+        }
+
+        /// <summary>
         /// Gets the position at the center of the grid cell in local space.
         /// </summary>
         /// <remarks>
@@ -228,8 +243,6 @@ namespace Gridmap
                     }
                     return centeredPosition;
             }
-
-            
         }
         #endregion
 

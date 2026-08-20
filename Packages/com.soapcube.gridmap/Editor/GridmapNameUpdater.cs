@@ -25,9 +25,16 @@ namespace Gridmap.Editor
             if(Selection.activeObject is GameObject go && go.TryGetComponent(out Gridmap gmap))
             {
                 Tilemap painter = gmap.GetComponentInChildren<Tilemap>();
-                if (painter != null && painter.name != gmap.name)
+                if (painter != null)
                 {
-                    painter.name = gmap.name;
+                    if (painter.name != gmap.name)
+                    {
+                        painter.name = gmap.name;
+                    }
+                    //if (painter.gameObject.layer != gmap.gameObject.layer)
+                    //{
+                    //    painter.gameObject.layer = gmap.gameObject.layer;
+                    //}
                 }
             }
         }
