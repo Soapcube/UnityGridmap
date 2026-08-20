@@ -265,8 +265,6 @@ namespace Gridmap
                 {
                     rebakedChunks.Add(chunkPosition);
                 }
-
-                // Also check for rebaking adjacent chunks later when we implement rule tiles.
             }
 
             foreach(Vector3Int pos in rebakedChunks)
