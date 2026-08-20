@@ -8,6 +8,7 @@
 *****************************************************************************/
 using Gridmap.Editor;
 using UnityEditor;
+using UnityEditor.Tilemaps;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 

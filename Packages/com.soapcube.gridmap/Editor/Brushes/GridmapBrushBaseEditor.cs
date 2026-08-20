@@ -8,10 +8,12 @@
 *****************************************************************************/
 using System.Linq;
 using UnityEditor;
+using UnityEditor.EditorTools;
 using UnityEditor.SceneManagement;
 using UnityEditor.Tilemaps;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEngine.UIElements;
 
 namespace Gridmap.Brushes.Editor
 {
@@ -63,7 +65,9 @@ namespace Gridmap.Brushes.Editor
 
             //EditorGUILayout.PropertyField(brushElevation);
             base.OnInspectorGUI();
-            //EditorGUILayout.PropertyField(gridZ);
+
+            // Draw specific editors for each tool.
+            //EditorGUILayout.LabelField(ToolManager.activeToolType.ToString());
 
             // Update the position of the tilemap based on the brushElevation.
 
