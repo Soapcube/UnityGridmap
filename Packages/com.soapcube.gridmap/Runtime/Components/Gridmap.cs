@@ -25,7 +25,8 @@ namespace Gridmap
         #endregion
 
         [SerializeField] private Vector3 _tileAnchor = new Vector3(0.5f, 0.5f, 0.5f);
-        [SerializeField] private ChunkDictionary chunks;
+        //[SerializeField] private ChunkDictionary chunks;
+        [SerializeField] private Dictionary<Vector3Int, MeshChunk> chunks;
 
         #region Component References
         [SerializeReference, ShowIfNull] private Tilemap tilemap;

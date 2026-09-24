@@ -51,7 +51,9 @@ namespace Gridmap.Editor
             }
             
             EditorGUILayout.PropertyField(tilemap);
+            EditorGUI.BeginDisabledGroup(true);
             EditorGUILayout.PropertyField(chunks);
+            EditorGUI.EndDisabledGroup();
 
             Gridmap gridmap = (Gridmap)target;
 

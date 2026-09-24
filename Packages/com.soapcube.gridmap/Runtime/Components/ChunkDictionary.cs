@@ -14,6 +14,7 @@ using UnityEngine;
 namespace Gridmap
 {
     [Serializable]
+    [Obsolete("Use SerializedField Dictionary instead.")]
     public class ChunkDictionary : Dictionary<Vector3Int, MeshChunk>, ISerializationCallbackReceiver
     {
         [SerializeField] private Vector3Int[] keys;
