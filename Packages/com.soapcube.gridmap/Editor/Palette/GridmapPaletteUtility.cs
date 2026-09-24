@@ -27,20 +27,21 @@ namespace Gridmap.Editor
         private static Texture2D prefabIcon = (EditorGUIUtility.IconContent("Prefab Icon").image as Texture2D);
 
         #region Nested
-        public class DoCreateRectangularPaletteFile : UnityEditor.ProjectWindowCallback.EndNameEditAction
+        public class DoCreateRectangularPaletteFile : UnityEditor.ProjectWindowCallback.AssetCreationEndAction
         {
             internal Vector3 rotation;
-            public override void Action(int instanceId, string pathName, string resourceFile)
+            public override void Action(EntityId entityId, string pathName, string resourceFile)
             {
                 Object o = CreatePalettePrefab(pathName, resourceFile, GridLayout.CellLayout.Rectangle, Vector3.one, GridmapEditorUtility.RECT_ANCHOR, rotation);
                 ProjectWindowUtil.ShowCreatedAsset(o);
             }
         }
 
-        public class DoCreateHexagonalPaletteFile : UnityEditor.ProjectWindowCallback.EndNameEditAction
+        public class DoCreateHexagonalPaletteFile : UnityEditor.ProjectWindowCallback.AssetCreationEndAction
         {
             internal Vector3 rotation;
-            public override void Action(int instanceId, string pathName, string resourceFile)
+
+            public override void Action(EntityId entityId, string pathName, string resourceFile)
             {
                 Object o = CreatePalettePrefab(pathName, resourceFile, GridLayout.CellLayout.Hexagon, GridmapEditorUtility.HEX_GRID_SIZE, Vector3.zero, rotation);
                 ProjectWindowUtil.ShowCreatedAsset(o);
