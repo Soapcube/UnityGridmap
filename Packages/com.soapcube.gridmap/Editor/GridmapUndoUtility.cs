@@ -32,8 +32,8 @@ namespace Gridmap.Editor
         {
             if (info.undoName.Contains(GMAP_UNDO_IDENTIFIER))
             {
-                int instanceId = GetInstanceIDFromUndoName(info.undoName);
-                GameObject gmapObbj = EditorUtility.InstanceIDToObject(instanceId) as GameObject;
+                EntityId entityId = GetEntityIDFromUndoName(info.undoName);
+                GameObject gmapObbj = EditorUtility.EntityIdToObject(entityId) as GameObject;
                 if (gmapObbj != null && gmapObbj.TryGetComponent(out Gridmap gmap))
                 {
                     // Bake all for now, we can make it more efficient by storing edited chunks.
@@ -42,14 +42,16 @@ namespace Gridmap.Editor
             }
         }
 
-        private static int GetInstanceIDFromUndoName(string name)
+        private static EntityId GetEntityIDFromUndoName(string name)
         {
             // Get the edited gridmap from the instance id.
             int startIndex = name.IndexOf(GMAP_UNDO_IDENTIFIER) + GMAP_UNDO_IDENTIFIER.Length + 1;
             int endIndex = name.Length - 1;
             string instanceIdString = name.Substring(startIndex, endIndex - startIndex);
-            int instanceId = Int32.Parse(instanceIdString);
-            return instanceId;
+            // Updated from InstanceID int to EntityId ulong.  Should update the undo utility to be more flexible
+            // with new implementations of EntityId since it's stated to be changed.
+            ulong instanceId = UInt64.Parse(instanceIdString);
+            return EntityId.FromULong(instanceId);
         }
 
         /// <summary>
@@ -62,7 +64,7 @@ namespace Gridmap.Editor
             //Uses the undo message to encode the Instance ID of the modified gridmap so it can be found for
             //rebaking later.
             Undo.RegisterFullObjectHierarchyUndo(gmap.gameObject, undoMessage + 
-                $" ({GMAP_UNDO_IDENTIFIER}:{gmap.gameObject.GetInstanceID()})");
+                $" ({GMAP_UNDO_IDENTIFIER}:{EntityId.ToULong(gmap.gameObject.GetEntityId())})");
         }
     }
 }

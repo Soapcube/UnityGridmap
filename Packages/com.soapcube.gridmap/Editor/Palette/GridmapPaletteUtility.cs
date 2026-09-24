@@ -27,20 +27,21 @@ namespace Gridmap.Editor
         private static Texture2D prefabIcon = (EditorGUIUtility.IconContent("Prefab Icon").image as Texture2D);
 
         #region Nested
-        public class DoCreateRectangularPaletteFile : UnityEditor.ProjectWindowCallback.EndNameEditAction
+        public class DoCreateRectangularPaletteFile : UnityEditor.ProjectWindowCallback.AssetCreationEndAction
         {
             internal Vector3 rotation;
-            public override void Action(int instanceId, string pathName, string resourceFile)
+            public override void Action(EntityId entityId, string pathName, string resourceFile)
             {
                 Object o = CreatePalettePrefab(pathName, resourceFile, GridLayout.CellLayout.Rectangle, Vector3.one, GridmapEditorUtility.RECT_ANCHOR, rotation);
                 ProjectWindowUtil.ShowCreatedAsset(o);
             }
         }
 
-        public class DoCreateHexagonalPaletteFile : UnityEditor.ProjectWindowCallback.EndNameEditAction
+        public class DoCreateHexagonalPaletteFile : UnityEditor.ProjectWindowCallback.AssetCreationEndAction
         {
             internal Vector3 rotation;
-            public override void Action(int instanceId, string pathName, string resourceFile)
+
+            public override void Action(EntityId entityId, string pathName, string resourceFile)
             {
                 Object o = CreatePalettePrefab(pathName, resourceFile, GridLayout.CellLayout.Hexagon, GridmapEditorUtility.HEX_GRID_SIZE, Vector3.zero, rotation);
                 ProjectWindowUtil.ShowCreatedAsset(o);
@@ -55,7 +56,7 @@ namespace Gridmap.Editor
             DoCreateRectangularPaletteFile callback = ScriptableObject.CreateInstance<DoCreateRectangularPaletteFile>();
             callback.rotation = Vector3.zero;
             //Utilized built-in project window utilities to create the GridPalette object.
-            ProjectWindowUtil.StartNameEditingIfProjectWindowExists(0, 
+            ProjectWindowUtil.StartNameEditingIfProjectWindowExists(EntityId.None, 
                 callback, GRIDPALETTE_PATH, prefabIcon, TEMPLATE_PATH);
         }
         [MenuItem("Assets/Create/Gridmap/Gridmap Palette/Rectangular Top Down", false, (int)GridmapEditorUtility.GridmapCreatePriority.RectangularTopDown)]
@@ -64,7 +65,7 @@ namespace Gridmap.Editor
             DoCreateRectangularPaletteFile callback = ScriptableObject.CreateInstance<DoCreateRectangularPaletteFile>();
             callback.rotation = GridmapEditorUtility.TOP_DOWN_ROTATION;
             //Utilized built-in project window utilities to create the GridPalette object.
-            ProjectWindowUtil.StartNameEditingIfProjectWindowExists(0,
+            ProjectWindowUtil.StartNameEditingIfProjectWindowExists(EntityId.None,
                 callback, GRIDPALETTE_PATH, prefabIcon, TEMPLATE_PATH);
         }
 
@@ -74,7 +75,7 @@ namespace Gridmap.Editor
             DoCreateHexagonalPaletteFile callback = ScriptableObject.CreateInstance<DoCreateHexagonalPaletteFile>();
             callback.rotation = Vector3.zero;
             //Utilized built-in project window utilities to create the GridPalette object.
-            ProjectWindowUtil.StartNameEditingIfProjectWindowExists(0,
+            ProjectWindowUtil.StartNameEditingIfProjectWindowExists(EntityId.None,
                 callback, GRIDPALETTE_PATH, prefabIcon, TEMPLATE_PATH);
         }
         [MenuItem("Assets/Create/Gridmap/Gridmap Palette/Hexagonal Top Down", false, (int)GridmapEditorUtility.GridmapCreatePriority.HexagonalTopDown)]
@@ -83,7 +84,7 @@ namespace Gridmap.Editor
             DoCreateHexagonalPaletteFile callback = ScriptableObject.CreateInstance<DoCreateHexagonalPaletteFile>();
             callback.rotation = GridmapEditorUtility.TOP_DOWN_ROTATION;
             //Utilized built-in project window utilities to create the GridPalette object.
-            ProjectWindowUtil.StartNameEditingIfProjectWindowExists(0,
+            ProjectWindowUtil.StartNameEditingIfProjectWindowExists(EntityId.None,
                 callback, GRIDPALETTE_PATH, prefabIcon, TEMPLATE_PATH);
         }
         #endregion
